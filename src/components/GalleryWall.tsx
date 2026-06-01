@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import { getWebPUrl } from '../lib/imageUtils'
 import { trackGalleryInteraction } from '../lib/analytics'
 
 // All car images from the cars folder
@@ -52,7 +51,6 @@ const GalleryWall = () => {
           {/* Masonry Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {galleryImages.slice(0, visibleCount).map((image, index) => {
-              const webpImage = getWebPUrl(image)
               return (
                 <motion.div
                   key={index}
@@ -63,18 +61,12 @@ const GalleryWall = () => {
                   className="group relative aspect-square overflow-hidden rounded-sm border border-border cursor-pointer"
                   onClick={() => handleImageClick(image, index)}
                 >
-                  <picture>
-                    <source
-                      type="image/webp"
-                      srcSet={webpImage}
-                    />
-                    <img
-                      src={image}
-                      alt={`Gallery image ${index + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      loading="lazy"
-                    />
-                  </picture>
+                  <img
+                    src={image}
+                    alt={`Gallery image ${index + 1}`}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    loading="lazy"
+                  />
                   <div className="absolute inset-0 bg-background/0 group-hover:bg-background/60 transition-colors duration-300 flex items-center justify-center">
                     <motion.div
                       initial={{ opacity: 0, scale: 0.8 }}
@@ -121,25 +113,15 @@ const GalleryWall = () => {
             <X size={24} />
           </button>
 
-          <motion.picture
+          <motion.img
+            src={selectedImage}
+            alt="Gallery preview"
+            className="max-w-full max-h-full object-contain rounded-sm"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.3 }}
             onClick={(e) => e.stopPropagation()}
-          >
-            <source
-              type="image/webp"
-              srcSet={getWebPUrl(selectedImage)}
-            />
-            <motion.img
-              src={selectedImage}
-              alt="Gallery preview"
-              className="max-w-full max-h-full object-contain rounded-sm"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            />
-          </motion.picture>
+          />
         </motion.div>
       )}
     </>
