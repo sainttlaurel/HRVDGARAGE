@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Mail, Phone, MapPin } from 'lucide-react'
+import { Mail, Phone, MapPin, Facebook } from 'lucide-react'
 import { useState } from 'react'
 import { inquiryService } from '../lib/supabase'
 import { validateContactForm, ValidationError, getFieldError } from '../lib/validation'
@@ -130,6 +130,18 @@ const Contact = () => {
                   <p className="label-small mb-2">Email / Messenger</p>
                   <a href="mailto:hrvdcartrading@gmail.com" className="text-lg hover:text-motorsport-red transition-colors">
                     hrvdcartrading@gmail.com
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center flex-shrink-0">
+                  <Facebook size={20} />
+                </div>
+                <div>
+                  <p className="label-small mb-2">Facebook</p>
+                  <a href="https://www.facebook.com/HRVDCarTrading" target="_blank" rel="noopener noreferrer" className="text-lg hover:text-motorsport-red transition-colors">
+                    HRVDCarTrading
                   </a>
                 </div>
               </div>

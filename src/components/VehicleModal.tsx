@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Phone, Mail, MapPin, DollarSign } from 'lucide-react'
+import { X, Phone, Mail, MapPin, DollarSign, Facebook } from 'lucide-react'
 import ImageGallery from './ImageGallery'
 
 interface VehicleModalProps {
@@ -137,6 +137,18 @@ const VehicleModal = ({ isOpen, onClose, vehicle }: VehicleModalProps) => {
 
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center flex-shrink-0">
+                          <Facebook size={18} />
+                        </div>
+                        <div>
+                          <p className="text-xs text-foreground-muted">Facebook</p>
+                          <a href="https://www.facebook.com/HRVDCarTrading" target="_blank" rel="noopener noreferrer" className="hover:text-motorsport-red transition-colors">
+                            HRVDCarTrading
+                          </a>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center flex-shrink-0">
                           <MapPin size={18} />
                         </div>
                         <div>
@@ -153,6 +165,14 @@ const VehicleModal = ({ isOpen, onClose, vehicle }: VehicleModalProps) => {
                         className="btn-secondary flex-1 text-center"
                       >
                         Call Now
+                      </a>
+                      <a
+                        href="https://www.facebook.com/HRVDCarTrading"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-secondary flex-1 text-center"
+                      >
+                        Message on Facebook
                       </a>
                       <a
                         href="#contact"
