@@ -161,12 +161,6 @@ const VehicleModal = ({ isOpen, onClose, vehicle }: VehicleModalProps) => {
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row gap-4">
                       <a
-                        href="tel:+639123456789"
-                        className="btn-secondary flex-1 text-center"
-                      >
-                        Call Now
-                      </a>
-                      <a
                         href="https://www.facebook.com/HRVDCarTrading"
                         target="_blank"
                         rel="noopener noreferrer"

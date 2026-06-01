@@ -53,7 +53,7 @@ const ImageZoom = ({ src, alt, className = '' }: ImageZoomProps) => {
         alt={alt}
         className="w-full h-full object-cover"
         animate={{
-          scale: isZoomed ? 1.3 : 1,
+          scale: isZoomed ? 1.15 : 1,
         }}
         transition={{ duration: 0.3 }}
       />
@@ -98,7 +98,7 @@ const ImageZoom = ({ src, alt, className = '' }: ImageZoomProps) => {
               left: 0,
               top: 0,
               backgroundImage: `url(${src})`,
-              backgroundSize: '1200%',
+              backgroundSize: '900%',
               backgroundPosition: `${position.x}% ${position.y}%`,
               backgroundRepeat: 'no-repeat',
             }}
