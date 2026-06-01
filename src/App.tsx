@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import LoadingScreen from './components/LoadingScreen'
+import Paywall from './components/Paywall'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Features from './components/Features'
@@ -24,9 +25,25 @@ const GalleryWall = lazy(() => import('./components/GalleryWall'))
 const Showreel = lazy(() => import('./components/Showreel'))
 const AdminPortal = lazy(() => import('./pages/AdminPortal'))
 
+// Paywall active flag - set to true to enable paywall
+const PAYWALL_ACTIVE = true
+
 function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [isAdminPage, setIsAdminPage] = useState(window.location.pathname === '/admin')
+
+  useEffect(() => {
+    // Lock scroll when paywall is active
+    if (PAYWALL_ACTIVE) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [])
 
   useEffect(() => {
     // Initialize offline support
@@ -100,6 +117,9 @@ function App() {
   return (
     <ErrorBoundary>
       <>
+        {/* Paywall Overlay */}
+        <Paywall isActive={PAYWALL_ACTIVE} />
+
         <ToastContainer />
         <OfflineIndicator />
         <AnalyticsConsent onConsent={handleAnalyticsConsent} />
