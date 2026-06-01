@@ -9,9 +9,8 @@ const ThemeToggle = () => {
   useEffect(() => {
     // Initialize theme on mount
     const savedTheme = localStorage.getItem('theme')
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    
-    const shouldBeDark = savedTheme ? savedTheme === 'dark' : prefersDark
+    // Default to dark mode if no saved theme
+    const shouldBeDark = savedTheme ? savedTheme === 'dark' : true
     
     setIsDark(shouldBeDark)
     applyTheme(shouldBeDark)
