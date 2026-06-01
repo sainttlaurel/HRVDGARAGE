@@ -5,10 +5,34 @@ interface LoadingScreenProps {
   onLoadingComplete: () => void
 }
 
+// Funny troll error messages
+const trollErrors = [
+  '🤖 Initializing AI to judge your car choices...',
+  '⚙️ Recalibrating the vibe check algorithm...',
+  '🚗 Teaching the server how to drift...',
+  '💾 Downloading more RAM...',
+  '🔧 Fixing bugs that don\'t exist yet...',
+  '🎨 Making pixels look extra shiny...',
+  '📡 Communicating with the car gods...',
+  '🌍 Rotating the earth for better loading...',
+  '⚡ Charging the internet battery...',
+  '🎯 Calibrating the hype machine...',
+]
+
 const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false)
   const [shouldExit, setShouldExit] = useState(false)
   const [videoError, setVideoError] = useState(false)
+  const [currentError, setCurrentError] = useState(0)
+
+  useEffect(() => {
+    // Change error message every 800ms for comedy effect
+    const errorInterval = setInterval(() => {
+      setCurrentError((prev) => (prev + 1) % trollErrors.length)
+    }, 800)
+
+    return () => clearInterval(errorInterval)
+  }, [])
 
   useEffect(() => {
     // Minimum display time of 3 seconds (reduced from 8)
@@ -83,20 +107,34 @@ const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
           {/* Dark Overlay */}
           <div className="absolute inset-0 bg-background/30" />
 
-          {/* Loading Text */}
+          {/* Loading Text with Troll Errors */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.6 }}
-            className="absolute bottom-20 left-1/2 -translate-x-1/2"
+            className="absolute bottom-20 left-1/2 -translate-x-1/2 text-center"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex items-center gap-2">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  className="w-4 h-4 border-2 border-foreground border-t-transparent rounded-full"
+                />
+                <p className="label-small">Loading Experience</p>
+              </div>
+              
+              {/* Troll Error Messages */}
               <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                className="w-4 h-4 border-2 border-foreground border-t-transparent rounded-full"
-              />
-              <p className="label-small">Loading Experience</p>
+                key={currentError}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="text-xs text-foreground-muted italic max-w-xs"
+              >
+                {trollErrors[currentError]}
+              </motion.div>
             </div>
           </motion.div>
         </motion.div>
