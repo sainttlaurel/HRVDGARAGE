@@ -1,6 +1,6 @@
 /**
- * Professional Email Templates for Sacred Garage
- * Used for admin notifications
+ * Professional Email Templates for HRVD Car Trading
+ * Used for admin notifications and customer communications
  */
 
 export interface EmailTemplate {
@@ -8,6 +8,223 @@ export interface EmailTemplate {
   html: string
   text: string
 }
+
+/**
+ * Base email styles - shared across all templates
+ */
+const baseStyles = `
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: #1f2937;
+    background-color: #f3f4f6;
+  }
+  .container {
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  .header {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: #ffffff;
+    padding: 40px 32px;
+    text-align: center;
+    border-bottom: 4px solid #dc2626;
+  }
+  .header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .header p {
+    margin: 8px 0 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+    font-weight: 500;
+  }
+  .badge {
+    display: inline-block;
+    background-color: #dc2626;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 24px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .badge.success {
+    background-color: #16a34a;
+  }
+  .badge.info {
+    background-color: #2563eb;
+  }
+  .content {
+    padding: 40px 32px;
+  }
+  .intro {
+    margin-top: 0;
+    color: #1f2937;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .section {
+    margin-bottom: 32px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .info-row:last-child {
+    border-bottom: none;
+  }
+  .info-label {
+    font-weight: 600;
+    color: #1f2937;
+    min-width: 140px;
+  }
+  .info-value {
+    color: #6b7280;
+    text-align: right;
+    flex: 1;
+    word-break: break-word;
+  }
+  .info-value a {
+    color: #dc2626;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .info-value a:hover {
+    text-decoration: underline;
+  }
+  .highlight-box {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border-left: 4px solid #dc2626;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 12px;
+  }
+  .highlight-box.success {
+    border-left-color: #16a34a;
+  }
+  .highlight-box.info {
+    border-left-color: #2563eb;
+  }
+  .highlight-box p {
+    margin: 0;
+    color: #1f2937;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .detail-box {
+    background-color: #f9fafb;
+    border: 2px solid #e5e7eb;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 12px;
+  }
+  .detail-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 12px 0;
+  }
+  .detail-text {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.8;
+  }
+  .cta-button {
+    display: inline-block;
+    background-color: #dc2626;
+    color: white;
+    padding: 14px 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    margin-top: 28px;
+    transition: all 0.2s;
+    font-size: 15px;
+  }
+  .cta-button:hover {
+    background-color: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+  .cta-button.success {
+    background-color: #16a34a;
+  }
+  .cta-button.success:hover {
+    background-color: #15803d;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  }
+  .footer {
+    background-color: #f9fafb;
+    padding: 28px 32px;
+    text-align: center;
+    border-top: 1px solid #e5e7eb;
+    font-size: 12px;
+    color: #9ca3af;
+  }
+  .footer p {
+    margin: 0;
+    line-height: 1.6;
+  }
+  .footer-divider {
+    margin: 12px 0;
+  }
+  .logo {
+    font-size: 24px;
+    margin-right: 8px;
+  }
+  @media (max-width: 600px) {
+    .container {
+      margin: 0;
+      border-radius: 0;
+    }
+    .header {
+      padding: 32px 24px;
+    }
+    .content {
+      padding: 24px;
+    }
+    .info-row {
+      flex-direction: column;
+    }
+    .info-value {
+      text-align: left;
+      margin-top: 4px;
+    }
+    .footer {
+      padding: 20px 24px;
+    }
+  }
+`
 
 /**
  * New Inquiry Notification Email
@@ -27,151 +244,37 @@ export const newInquiryTemplate = (data: {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.6;
-      color: #333;
-      background-color: #f9fafb;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #ffffff;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-      color: #ffffff;
-      padding: 32px 24px;
-      text-align: center;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 600;
-    }
-    .header p {
-      margin: 8px 0 0 0;
-      font-size: 14px;
-      opacity: 0.9;
-    }
-    .badge {
-      display: inline-block;
-      background-color: #dc2626;
-      color: white;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-top: 12px;
-    }
-    .content {
-      padding: 32px 24px;
-    }
-    .section {
-      margin-bottom: 24px;
-    }
-    .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-    }
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .info-row:last-child {
-      border-bottom: none;
-    }
-    .info-label {
-      font-weight: 600;
-      color: #333;
-      min-width: 120px;
-    }
-    .info-value {
-      color: #666;
-      text-align: right;
-      flex: 1;
-      word-break: break-word;
-    }
-    .message-box {
-      background-color: #f9fafb;
-      border-left: 4px solid #dc2626;
-      padding: 16px;
-      border-radius: 4px;
-      margin-top: 12px;
-    }
-    .message-box p {
-      margin: 0;
-      color: #333;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-    .cta-button {
-      display: inline-block;
-      background-color: #dc2626;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: 600;
-      margin-top: 24px;
-      transition: background-color 0.2s;
-    }
-    .cta-button:hover {
-      background-color: #b91c1c;
-    }
-    .footer {
-      background-color: #f9fafb;
-      padding: 24px;
-      text-align: center;
-      border-top: 1px solid #e5e7eb;
-      font-size: 12px;
-      color: #666;
-    }
-    .footer p {
-      margin: 0;
-    }
-  </style>
+  <style>${baseStyles}</style>
 </head>
 <body>
   <div class="container">
     <!-- Header -->
     <div class="header">
-      <h1>🚗 Sacred Garage</h1>
+      <h1><span class="logo">🚗</span>HRVD Car Trading</h1>
       <p>New Customer Inquiry</p>
       <div class="badge">ACTION REQUIRED</div>
     </div>
 
     <!-- Content -->
     <div class="content">
-      <p style="margin-top: 0; color: #333; font-size: 16px;">
-        You have received a new inquiry from a potential customer.
+      <p class="intro">
+        You have received a new inquiry from a potential customer. Please review the details below and respond promptly to provide excellent customer service.
       </p>
 
       <!-- Customer Info -->
       <div class="section">
-        <div class="section-title">📋 Customer Information</div>
+        <div class="section-title">👤 Customer Information</div>
         <div class="info-row">
           <span class="info-label">Name:</span>
           <span class="info-value">${data.firstName} ${data.lastName}</span>
         </div>
         <div class="info-row">
           <span class="info-label">Email:</span>
-          <span class="info-value"><a href="mailto:${data.email}" style="color: #dc2626; text-decoration: none;">${data.email}</a></span>
+          <span class="info-value"><a href="mailto:${data.email}">${data.email}</a></span>
         </div>
         <div class="info-row">
           <span class="info-label">Phone:</span>
-          <span class="info-value"><a href="tel:${data.phone}" style="color: #dc2626; text-decoration: none;">${data.phone}</a></span>
+          <span class="info-value"><a href="tel:${data.phone}">${data.phone}</a></span>
         </div>
         <div class="info-row">
           <span class="info-label">Received:</span>
@@ -182,21 +285,22 @@ export const newInquiryTemplate = (data: {
       <!-- Message -->
       <div class="section">
         <div class="section-title">💬 Message</div>
-        <div class="message-box">
+        <div class="highlight-box">
           <p>${data.message}</p>
         </div>
       </div>
 
       <!-- CTA -->
-      <p style="margin-top: 24px; color: #666; font-size: 14px;">
-        Please respond to this inquiry as soon as possible to provide excellent customer service.
+      <p style="margin-top: 28px; color: #6b7280; font-size: 14px; line-height: 1.7;">
+        Please respond to this inquiry as soon as possible. Quick responses lead to better customer satisfaction and higher conversion rates.
       </p>
     </div>
 
     <!-- Footer -->
     <div class="footer">
-      <p>Sacred Garage Admin Notification System</p>
-      <p style="margin-top: 8px; opacity: 0.7;">This is an automated email. Please do not reply to this address.</p>
+      <p><strong>HRVD Car Trading Admin Notification</strong></p>
+      <p class="footer-divider">This is an automated email from your admin system.</p>
+      <p style="opacity: 0.7;">Please do not reply to this address. Use the customer's contact information above.</p>
     </div>
   </div>
 </body>
@@ -204,7 +308,7 @@ export const newInquiryTemplate = (data: {
   `.trim()
 
   const text = `
-Sacred Garage - New Customer Inquiry
+HRVD CAR TRADING - NEW CUSTOMER INQUIRY
 
 CUSTOMER INFORMATION
 Name: ${data.firstName} ${data.lastName}
@@ -217,7 +321,7 @@ ${data.message}
 
 ---
 Please respond to this inquiry as soon as possible.
-Sacred Garage Admin Notification System
+HRVD Car Trading Admin Notification System
   `.trim()
 
   return {
@@ -248,150 +352,32 @@ export const newPartOrderTemplate = (data: {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.6;
-      color: #333;
-      background-color: #f9fafb;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #ffffff;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-      color: #ffffff;
-      padding: 32px 24px;
-      text-align: center;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 600;
-    }
-    .header p {
-      margin: 8px 0 0 0;
-      font-size: 14px;
-      opacity: 0.9;
-    }
-    .badge {
-      display: inline-block;
-      background-color: #16a34a;
-      color: white;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-top: 12px;
-    }
-    .content {
-      padding: 32px 24px;
-    }
-    .section {
-      margin-bottom: 24px;
-    }
-    .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-    }
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .info-row:last-child {
-      border-bottom: none;
-    }
-    .info-label {
-      font-weight: 600;
-      color: #333;
-      min-width: 120px;
-    }
-    .info-value {
-      color: #666;
-      text-align: right;
-      flex: 1;
-      word-break: break-word;
-    }
-    .part-box {
-      background-color: #f9fafb;
-      border: 2px solid #e5e7eb;
-      padding: 16px;
-      border-radius: 6px;
-      margin-top: 12px;
-    }
-    .part-name {
-      font-size: 16px;
-      font-weight: 600;
-      color: #333;
-      margin: 0 0 8px 0;
-    }
-    .part-details {
-      font-size: 14px;
-      color: #666;
-      margin: 0;
-    }
-    .cta-button {
-      display: inline-block;
-      background-color: #16a34a;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: 600;
-      margin-top: 24px;
-      transition: background-color 0.2s;
-    }
-    .cta-button:hover {
-      background-color: #15803d;
-    }
-    .footer {
-      background-color: #f9fafb;
-      padding: 24px;
-      text-align: center;
-      border-top: 1px solid #e5e7eb;
-      font-size: 12px;
-      color: #666;
-    }
-    .footer p {
-      margin: 0;
-    }
-  </style>
+  <style>${baseStyles}</style>
 </head>
 <body>
   <div class="container">
     <!-- Header -->
     <div class="header">
-      <h1>🚗 Sacred Garage</h1>
-      <p>New Part Order</p>
-      <div class="badge">NEW ORDER</div>
+      <h1><span class="logo">🚗</span>HRVD Car Trading</h1>
+      <p>New Part Order Received</p>
+      <div class="badge success">NEW ORDER</div>
     </div>
 
     <!-- Content -->
     <div class="content">
-      <p style="margin-top: 0; color: #333; font-size: 16px;">
-        A customer has placed a new order for a part.
+      <p class="intro">
+        A customer has placed a new order for a part. Please review the details and contact the customer to confirm the order and arrange payment/delivery.
       </p>
 
       <!-- Part Info -->
       <div class="section">
         <div class="section-title">🔧 Part Details</div>
-        <div class="part-box">
-          <p class="part-name">${data.partBrand} ${data.partName}</p>
-          <p class="part-details">
+        <div class="detail-box">
+          <p class="detail-title">${data.partBrand} ${data.partName}</p>
+          <p class="detail-text">
             <strong>Price:</strong> ${data.partPrice}<br>
-            <strong>Quantity:</strong> ${data.quantity}<br>
-            <strong>Delivery:</strong> ${data.deliveryOption}
+            <strong>Quantity:</strong> ${data.quantity} unit(s)<br>
+            <strong>Delivery Option:</strong> ${data.deliveryOption}
           </p>
         </div>
       </div>
@@ -405,11 +391,11 @@ export const newPartOrderTemplate = (data: {
         </div>
         <div class="info-row">
           <span class="info-label">Email:</span>
-          <span class="info-value"><a href="mailto:${data.customerEmail}" style="color: #16a34a; text-decoration: none;">${data.customerEmail}</a></span>
+          <span class="info-value"><a href="mailto:${data.customerEmail}">${data.customerEmail}</a></span>
         </div>
         <div class="info-row">
           <span class="info-label">Phone:</span>
-          <span class="info-value"><a href="tel:${data.customerPhone}" style="color: #16a34a; text-decoration: none;">${data.customerPhone}</a></span>
+          <span class="info-value"><a href="tel:${data.customerPhone}">${data.customerPhone}</a></span>
         </div>
         <div class="info-row">
           <span class="info-label">Order Date:</span>
@@ -418,15 +404,16 @@ export const newPartOrderTemplate = (data: {
       </div>
 
       <!-- CTA -->
-      <p style="margin-top: 24px; color: #666; font-size: 14px;">
-        Please contact the customer to confirm the order and arrange payment/delivery.
+      <p style="margin-top: 28px; color: #6b7280; font-size: 14px; line-height: 1.7;">
+        Please contact the customer within 24 hours to confirm the order and arrange payment and delivery details.
       </p>
     </div>
 
     <!-- Footer -->
     <div class="footer">
-      <p>Sacred Garage Admin Notification System</p>
-      <p style="margin-top: 8px; opacity: 0.7;">This is an automated email. Please do not reply to this address.</p>
+      <p><strong>HRVD Car Trading Admin Notification</strong></p>
+      <p class="footer-divider">This is an automated email from your admin system.</p>
+      <p style="opacity: 0.7;">Please do not reply to this address. Use the customer's contact information above.</p>
     </div>
   </div>
 </body>
@@ -434,7 +421,7 @@ export const newPartOrderTemplate = (data: {
   `.trim()
 
   const text = `
-Sacred Garage - New Part Order
+HRVD CAR TRADING - NEW PART ORDER
 
 PART DETAILS
 Brand: ${data.partBrand}
@@ -451,7 +438,7 @@ Order Date: ${data.timestamp}
 
 ---
 Please contact the customer to confirm the order.
-Sacred Garage Admin Notification System
+HRVD Car Trading Admin Notification System
   `.trim()
 
   return {
@@ -483,147 +470,29 @@ export const newVehicleInquiryTemplate = (data: {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.6;
-      color: #333;
-      background-color: #f9fafb;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #ffffff;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-      color: #ffffff;
-      padding: 32px 24px;
-      text-align: center;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 600;
-    }
-    .header p {
-      margin: 8px 0 0 0;
-      font-size: 14px;
-      opacity: 0.9;
-    }
-    .badge {
-      display: inline-block;
-      background-color: #2563eb;
-      color: white;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-top: 12px;
-    }
-    .content {
-      padding: 32px 24px;
-    }
-    .section {
-      margin-bottom: 24px;
-    }
-    .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-    }
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .info-row:last-child {
-      border-bottom: none;
-    }
-    .info-label {
-      font-weight: 600;
-      color: #333;
-      min-width: 120px;
-    }
-    .info-value {
-      color: #666;
-      text-align: right;
-      flex: 1;
-      word-break: break-word;
-    }
-    .vehicle-box {
-      background-color: #f9fafb;
-      border: 2px solid #e5e7eb;
-      padding: 16px;
-      border-radius: 6px;
-      margin-top: 12px;
-    }
-    .vehicle-name {
-      font-size: 16px;
-      font-weight: 600;
-      color: #333;
-      margin: 0 0 8px 0;
-    }
-    .vehicle-details {
-      font-size: 14px;
-      color: #666;
-      margin: 0;
-    }
-    .message-box {
-      background-color: #f9fafb;
-      border-left: 4px solid #2563eb;
-      padding: 16px;
-      border-radius: 4px;
-      margin-top: 12px;
-    }
-    .message-box p {
-      margin: 0;
-      color: #333;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-    .footer {
-      background-color: #f9fafb;
-      padding: 24px;
-      text-align: center;
-      border-top: 1px solid #e5e7eb;
-      font-size: 12px;
-      color: #666;
-    }
-    .footer p {
-      margin: 0;
-    }
-  </style>
+  <style>${baseStyles}</style>
 </head>
 <body>
   <div class="container">
     <!-- Header -->
     <div class="header">
-      <h1>🚗 Sacred Garage</h1>
+      <h1><span class="logo">🚗</span>HRVD Car Trading</h1>
       <p>New Vehicle Inquiry</p>
-      <div class="badge">INQUIRY</div>
+      <div class="badge info">INQUIRY</div>
     </div>
 
     <!-- Content -->
     <div class="content">
-      <p style="margin-top: 0; color: #333; font-size: 16px;">
-        A customer has inquired about one of your vehicles.
+      <p class="intro">
+        A customer has inquired about one of your vehicles. Please review the details and respond promptly to move the sale forward.
       </p>
 
       <!-- Vehicle Info -->
       <div class="section">
         <div class="section-title">🚙 Vehicle Details</div>
-        <div class="vehicle-box">
-          <p class="vehicle-name">${data.vehicleYear} ${data.vehicleBrand} ${data.vehicleModel}</p>
-          <p class="vehicle-details">
+        <div class="detail-box">
+          <p class="detail-title">${data.vehicleYear} ${data.vehicleBrand} ${data.vehicleModel}</p>
+          <p class="detail-text">
             <strong>Price:</strong> ${data.vehiclePrice}<br>
             <strong>Inquiry Type:</strong> ${data.inquiryType}
           </p>
@@ -639,11 +508,11 @@ export const newVehicleInquiryTemplate = (data: {
         </div>
         <div class="info-row">
           <span class="info-label">Email:</span>
-          <span class="info-value"><a href="mailto:${data.customerEmail}" style="color: #2563eb; text-decoration: none;">${data.customerEmail}</a></span>
+          <span class="info-value"><a href="mailto:${data.customerEmail}">${data.customerEmail}</a></span>
         </div>
         <div class="info-row">
           <span class="info-label">Phone:</span>
-          <span class="info-value"><a href="tel:${data.customerPhone}" style="color: #2563eb; text-decoration: none;">${data.customerPhone}</a></span>
+          <span class="info-value"><a href="tel:${data.customerPhone}">${data.customerPhone}</a></span>
         </div>
         <div class="info-row">
           <span class="info-label">Inquiry Date:</span>
@@ -654,21 +523,22 @@ export const newVehicleInquiryTemplate = (data: {
       <!-- Message -->
       <div class="section">
         <div class="section-title">💬 Message</div>
-        <div class="message-box">
+        <div class="highlight-box info">
           <p>${data.message}</p>
         </div>
       </div>
 
       <!-- CTA -->
-      <p style="margin-top: 24px; color: #666; font-size: 14px;">
-        Please respond to the customer's inquiry as soon as possible.
+      <p style="margin-top: 28px; color: #6b7280; font-size: 14px; line-height: 1.7;">
+        Please respond to the customer's inquiry as soon as possible. Prompt communication significantly improves the chances of closing the sale.
       </p>
     </div>
 
     <!-- Footer -->
     <div class="footer">
-      <p>Sacred Garage Admin Notification System</p>
-      <p style="margin-top: 8px; opacity: 0.7;">This is an automated email. Please do not reply to this address.</p>
+      <p><strong>HRVD Car Trading Admin Notification</strong></p>
+      <p class="footer-divider">This is an automated email from your admin system.</p>
+      <p style="opacity: 0.7;">Please do not reply to this address. Use the customer's contact information above.</p>
     </div>
   </div>
 </body>
@@ -676,7 +546,7 @@ export const newVehicleInquiryTemplate = (data: {
   `.trim()
 
   const text = `
-Sacred Garage - New Vehicle Inquiry
+HRVD CAR TRADING - NEW VEHICLE INQUIRY
 
 VEHICLE DETAILS
 Year: ${data.vehicleYear}
@@ -696,7 +566,7 @@ ${data.message}
 
 ---
 Please respond to the customer's inquiry.
-Sacred Garage Admin Notification System
+HRVD Car Trading Admin Notification System
   `.trim()
 
   return {
