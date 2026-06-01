@@ -17,6 +17,7 @@ import { loadFromSupabaseToLocalStorage, syncLocalStorageToSupabase } from './li
 import { initializeOfflineSupport } from './lib/offline'
 import { initializeDefaultData } from './lib/initializeData'
 import { initializeGoogleAnalytics, trackPageView } from './lib/analytics'
+import { updateMetaTags, setCanonicalURL, addOrganizationSchema, addLocalBusinessSchema, DEFAULT_SEO_CONFIG } from './lib/seo'
 
 // Lazy load heavy components
 const GalleryWall = lazy(() => import('./components/GalleryWall'))
@@ -33,6 +34,12 @@ function App() {
 
     // Initialize default data in localStorage
     initializeDefaultData()
+
+    // Initialize SEO
+    updateMetaTags(DEFAULT_SEO_CONFIG)
+    setCanonicalURL('https://sacredgarage.com/')
+    addOrganizationSchema()
+    addLocalBusinessSchema()
 
     // Check if user has already consented to analytics
     const consentDecision = localStorage.getItem('analytics_consent')

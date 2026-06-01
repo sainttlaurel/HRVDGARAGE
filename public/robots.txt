@@ -1,0 +1,24 @@
+# HRVD Car Trading - Robots.txt
+# Allow search engines to crawl the site
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /.env
+Disallow: /.env.local
+Disallow: /node_modules
+Disallow: /dist
+
+# Specific rules for Google
+User-agent: Googlebot
+Allow: /
+
+# Specific rules for Bing
+User-agent: Bingbot
+Allow: /
+
+# Crawl delay (in seconds)
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://sacredgarage.com/sitemap.xml
