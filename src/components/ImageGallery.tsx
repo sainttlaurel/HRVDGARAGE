@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import ImageZoom from './ImageZoom'
-import { getWebPUrl } from '../lib/imageUtils'
 
 interface ImageGalleryProps {
   images: string[]
@@ -26,24 +25,17 @@ const ImageGallery = ({ images, alt }: ImageGalleryProps) => {
   }
 
   const currentImage = images[currentIndex]
-  const webpImage = getWebPUrl(currentImage)
 
   return (
     <>
       <div className="space-y-4">
         {/* Main Image with Zoom */}
         <div className="relative aspect-[4/3] overflow-hidden rounded-sm border border-border group">
-          <picture>
-            <source
-              type="image/webp"
-              srcSet={webpImage}
-            />
-            <ImageZoom
-              src={currentImage}
-              alt={`${alt} - Image ${currentIndex + 1}`}
-              className="w-full h-full"
-            />
-          </picture>
+          <ImageZoom
+            src={currentImage}
+            alt={`${alt} - Image ${currentIndex + 1}`}
+            className="w-full h-full"
+          />
 
           {/* Navigation Arrows */}
           {images.length > 1 && (
@@ -83,7 +75,6 @@ const ImageGallery = ({ images, alt }: ImageGalleryProps) => {
         {images.length > 1 && (
           <div className="flex gap-2 overflow-x-auto pb-2">
             {images.map((image, index) => {
-              const webpThumb = getWebPUrl(image)
               return (
                 <button
                   key={index}
@@ -94,18 +85,12 @@ const ImageGallery = ({ images, alt }: ImageGalleryProps) => {
                       : 'border-border hover:border-foreground-muted'
                   }`}
                 >
-                  <picture>
-                    <source
-                      type="image/webp"
-                      srcSet={webpThumb}
-                    />
-                    <img
-                      src={image}
-                      alt={`${alt} thumbnail ${index + 1}`}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </picture>
+                  <img
+                    src={image}
+                    alt={`${alt} thumbnail ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
                 </button>
               )
             })}
@@ -132,18 +117,12 @@ const ImageGallery = ({ images, alt }: ImageGalleryProps) => {
 
             {/* Fullscreen Image */}
             <div className="relative w-full h-full flex items-center justify-center p-8">
-              <picture>
-                <source
-                  type="image/webp"
-                  srcSet={getWebPUrl(images[currentIndex])}
-                />
-                <img
-                  src={images[currentIndex]}
-                  alt={`${alt} fullscreen`}
-                  className="max-w-full max-h-full object-contain"
-                  loading="lazy"
-                />
-              </picture>
+              <img
+                src={images[currentIndex]}
+                alt={`${alt} fullscreen`}
+                className="max-w-full max-h-full object-contain"
+                loading="lazy"
+              />
 
               {/* Navigation */}
               {images.length > 1 && (

@@ -111,36 +111,7 @@ const ImageZoom = ({ src, alt, className = '' }: ImageZoomProps) => {
         )}
       </AnimatePresence>
 
-      {/* Zoom Indicator */}
-      <AnimatePresence>
-        {isZoomed && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-4 right-4 px-3 py-1 bg-background/90 backdrop-blur-sm border border-border rounded-sm"
-          >
-            <p className="text-xs uppercase tracking-luxury flex items-center gap-2">
-              <ZoomIn size={12} />
-              Zoom Active
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* Hover Hint */}
-      {!isZoomed && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="absolute bottom-4 right-4 px-3 py-1 bg-background/70 backdrop-blur-sm border border-border rounded-sm"
-        >
-          <p className="text-xs uppercase tracking-luxury flex items-center gap-2 text-foreground-muted">
-            <ZoomIn size={12} />
-            Hover to Zoom
-          </p>
-        </motion.div>
-      )}
     </div>
   )
 }
