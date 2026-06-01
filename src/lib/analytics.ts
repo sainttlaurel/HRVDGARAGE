@@ -170,6 +170,18 @@ export const trackSocialMediaClick = (platform: string, url: string) => {
 }
 
 /**
+ * Track review submission
+ */
+export const trackReviewSubmission = (itemType: string, itemName: string, rating: number) => {
+  trackEvent('submit_review', {
+    item_type: itemType,
+    item_name: itemName,
+    rating: rating,
+    timestamp: new Date().toISOString()
+  })
+}
+
+/**
  * Initialize Google Analytics
  */
 export const initializeGoogleAnalytics = (measurementId?: string) => {
