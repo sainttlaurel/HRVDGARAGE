@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { inquiryService } from '../lib/supabase'
 import { validateContactForm, ValidationError, getFieldError } from '../lib/validation'
 import { sendNewInquiryNotification } from '../lib/emailService'
+import { trackInquirySubmission } from '../lib/analytics'
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -47,6 +48,9 @@ const Contact = () => {
         message: formData.message,
         status: 'new'
       })
+
+      // Track inquiry submission
+      trackInquirySubmission('contact_form')
 
       // Send email notification to admin
       const emailSent = await sendNewInquiryNotification({

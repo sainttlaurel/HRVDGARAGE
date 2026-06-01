@@ -150,11 +150,18 @@ const Parts = () => {
       <section id="parts" className="relative py-32 overflow-hidden">
       {/* Background Image - Using car 1.jpg */}
       <div className="absolute inset-0 opacity-5">
-        <img
-          src="/cars/1.jpg"
-          alt="Background"
-          className="w-full h-full object-cover"
-        />
+        <picture>
+          <source
+            type="image/webp"
+            srcSet="/cars/1.webp"
+          />
+          <img
+            src="/cars/1.jpg"
+            alt="Background"
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </picture>
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background/98 to-background" />
       </div>
 

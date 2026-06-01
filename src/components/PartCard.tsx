@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion'
 import { ArrowUpRight, Package } from 'lucide-react'
+import { getWebPUrl } from '../lib/imageUtils'
+import { trackPartView } from '../lib/analytics'
 
 interface PartCardProps {
   image: string
@@ -11,9 +13,20 @@ interface PartCardProps {
   description: string
   index: number
   onInquire: () => void
+  partId?: string
 }
 
-const PartCard = ({ image, category, name, brand, price, condition, description, index, onInquire }: PartCardProps) => {
+const PartCard = ({ image, category, name, brand, price, condition, description, index, onInquire, partId }: PartCardProps) => {
+  const webpImage = getWebPUrl(image)
+
+  const handleInquire = () => {
+    // Track part view
+    if (partId) {
+      trackPartView(partId, name, category)
+    }
+    onInquire()
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
@@ -30,17 +43,24 @@ const PartCard = ({ image, category, name, brand, price, condition, description,
         </div>
         
         {/* Actual Image (if exists) */}
-        <motion.img
-          src={image}
-          alt={`${brand} ${name}`}
-          className="w-full h-full object-cover"
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.6 }}
-          onError={(e) => {
-            // Hide image if it fails to load
-            e.currentTarget.style.display = 'none'
-          }}
-        />
+        <picture>
+          <source
+            type="image/webp"
+            srcSet={webpImage}
+          />
+          <motion.img
+            src={image}
+            alt={`${brand} ${name}`}
+            className="w-full h-full object-cover"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.6 }}
+            loading="lazy"
+            onError={(e) => {
+              // Hide image if it fails to load
+              e.currentTarget.style.display = 'none'
+            }}
+          />
+        </picture>
         
         {/* Category Badge */}
         <div className="absolute top-4 left-4 px-3 py-1 bg-background/80 backdrop-blur-sm border border-border">
@@ -59,7 +79,7 @@ const PartCard = ({ image, category, name, brand, price, condition, description,
           className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center"
         >
           <motion.button
-            onClick={onInquire}
+            onClick={handleInquire}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             className="px-6 py-3 border border-foreground text-foreground font-medium text-sm uppercase tracking-luxury transition-all duration-300 hover:bg-foreground hover:text-background"

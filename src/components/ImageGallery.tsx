@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import ImageZoom from './ImageZoom'
+import { getWebPUrl } from '../lib/imageUtils'
 
 interface ImageGalleryProps {
   images: string[]
@@ -24,16 +25,25 @@ const ImageGallery = ({ images, alt }: ImageGalleryProps) => {
     setCurrentIndex(index)
   }
 
+  const currentImage = images[currentIndex]
+  const webpImage = getWebPUrl(currentImage)
+
   return (
     <>
       <div className="space-y-4">
         {/* Main Image with Zoom */}
         <div className="relative aspect-[4/3] overflow-hidden rounded-sm border border-border group">
-          <ImageZoom
-            src={images[currentIndex]}
-            alt={`${alt} - Image ${currentIndex + 1}`}
-            className="w-full h-full"
-          />
+          <picture>
+            <source
+              type="image/webp"
+              srcSet={webpImage}
+            />
+            <ImageZoom
+              src={currentImage}
+              alt={`${alt} - Image ${currentIndex + 1}`}
+              className="w-full h-full"
+            />
+          </picture>
 
           {/* Navigation Arrows */}
           {images.length > 1 && (
@@ -72,23 +82,33 @@ const ImageGallery = ({ images, alt }: ImageGalleryProps) => {
         {/* Thumbnail Strip */}
         {images.length > 1 && (
           <div className="flex gap-2 overflow-x-auto pb-2">
-            {images.map((image, index) => (
-              <button
-                key={index}
-                onClick={() => goToImage(index)}
-                className={`relative flex-shrink-0 w-20 h-20 rounded-sm overflow-hidden border-2 transition-all ${
-                  index === currentIndex
-                    ? 'border-motorsport-red'
-                    : 'border-border hover:border-foreground-muted'
-                }`}
-              >
-                <img
-                  src={image}
-                  alt={`${alt} thumbnail ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
+            {images.map((image, index) => {
+              const webpThumb = getWebPUrl(image)
+              return (
+                <button
+                  key={index}
+                  onClick={() => goToImage(index)}
+                  className={`relative flex-shrink-0 w-20 h-20 rounded-sm overflow-hidden border-2 transition-all ${
+                    index === currentIndex
+                      ? 'border-motorsport-red'
+                      : 'border-border hover:border-foreground-muted'
+                  }`}
+                >
+                  <picture>
+                    <source
+                      type="image/webp"
+                      srcSet={webpThumb}
+                    />
+                    <img
+                      src={image}
+                      alt={`${alt} thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </picture>
+                </button>
+              )
+            })}
           </div>
         )}
       </div>
@@ -112,11 +132,18 @@ const ImageGallery = ({ images, alt }: ImageGalleryProps) => {
 
             {/* Fullscreen Image */}
             <div className="relative w-full h-full flex items-center justify-center p-8">
-              <img
-                src={images[currentIndex]}
-                alt={`${alt} fullscreen`}
-                className="max-w-full max-h-full object-contain"
-              />
+              <picture>
+                <source
+                  type="image/webp"
+                  srcSet={getWebPUrl(images[currentIndex])}
+                />
+                <img
+                  src={images[currentIndex]}
+                  alt={`${alt} fullscreen`}
+                  className="max-w-full max-h-full object-contain"
+                  loading="lazy"
+                />
+              </picture>
 
               {/* Navigation */}
               {images.length > 1 && (

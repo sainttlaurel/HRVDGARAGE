@@ -9,6 +9,7 @@ import AdminSettings from '../components/admin/AdminSettings'
 import Toast from '../components/Toast'
 import { supabase } from '../lib/supabase'
 import { loadFromSupabaseToLocalStorage, syncLocalStorageToSupabase } from '../lib/syncToSupabase'
+import { trackAdminLogin } from '../lib/analytics'
 
 interface AdminPortalProps {
   onNavigateHome: () => void
@@ -95,6 +96,10 @@ const AdminPortal = ({ onNavigateHome }: AdminPortalProps) => {
         setShowToast(true)
       } else {
         console.log('Login successful:', data.user?.email)
+        // Track admin login
+        if (data.user?.id) {
+          trackAdminLogin(data.user.id)
+        }
         setEmail('')
         setPassword('')
         setToastMessage('Login successful!')

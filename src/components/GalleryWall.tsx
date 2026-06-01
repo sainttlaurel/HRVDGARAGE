@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { X } from 'lucide-react'
+import { getWebPUrl } from '../lib/imageUtils'
+import { trackGalleryInteraction } from '../lib/analytics'
 
 // All car images from the cars folder
 const galleryImages = [
@@ -19,6 +21,12 @@ const GalleryWall = () => {
 
   const loadMore = () => {
     setVisibleCount((prev) => Math.min(prev + 12, galleryImages.length))
+  }
+
+  const handleImageClick = (image: string, index: number) => {
+    // Track gallery interaction
+    trackGalleryInteraction('image_click', index)
+    setSelectedImage(image)
   }
 
   return (
@@ -43,32 +51,42 @@ const GalleryWall = () => {
 
           {/* Masonry Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {galleryImages.slice(0, visibleCount).map((image, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.02, duration: 0.4 }}
-                className="group relative aspect-square overflow-hidden rounded-sm border border-border cursor-pointer"
-                onClick={() => setSelectedImage(image)}
-              >
-                <img
-                  src={image}
-                  alt={`Gallery image ${index + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-background/0 group-hover:bg-background/60 transition-colors duration-300 flex items-center justify-center">
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileHover={{ opacity: 1, scale: 1 }}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <p className="text-sm uppercase tracking-luxury">View</p>
-                  </motion.div>
-                </div>
-              </motion.div>
-            ))}
+            {galleryImages.slice(0, visibleCount).map((image, index) => {
+              const webpImage = getWebPUrl(image)
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.02, duration: 0.4 }}
+                  className="group relative aspect-square overflow-hidden rounded-sm border border-border cursor-pointer"
+                  onClick={() => handleImageClick(image, index)}
+                >
+                  <picture>
+                    <source
+                      type="image/webp"
+                      srcSet={webpImage}
+                    />
+                    <img
+                      src={image}
+                      alt={`Gallery image ${index + 1}`}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                  </picture>
+                  <div className="absolute inset-0 bg-background/0 group-hover:bg-background/60 transition-colors duration-300 flex items-center justify-center">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileHover={{ opacity: 1, scale: 1 }}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <p className="text-sm uppercase tracking-luxury">View</p>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              )
+            })}
           </div>
 
           {/* Load More Button */}
@@ -103,15 +121,25 @@ const GalleryWall = () => {
             <X size={24} />
           </button>
 
-          <motion.img
+          <motion.picture
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.3 }}
-            src={selectedImage}
-            alt="Gallery preview"
-            className="max-w-full max-h-full object-contain rounded-sm"
             onClick={(e) => e.stopPropagation()}
-          />
+          >
+            <source
+              type="image/webp"
+              srcSet={getWebPUrl(selectedImage)}
+            />
+            <motion.img
+              src={selectedImage}
+              alt="Gallery preview"
+              className="max-w-full max-h-full object-contain rounded-sm"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            />
+          </motion.picture>
         </motion.div>
       )}
     </>

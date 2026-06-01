@@ -186,11 +186,18 @@ const Inventory = () => {
       <section id="inventory" className="relative py-32 overflow-hidden">
       {/* Background Image - Subtle overlay */}
       <div className="absolute inset-0 opacity-5">
-        <img
-          src="/cars/20.jpg"
-          alt="Background"
-          className="w-full h-full object-cover"
-        />
+        <picture>
+          <source
+            type="image/webp"
+            srcSet="/cars/20.webp"
+          />
+          <img
+            src="/cars/20.jpg"
+            alt="Background"
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </picture>
         <div className="absolute inset-0 bg-gradient-to-b from-background-soft via-background-soft/98 to-background-soft" />
       </div>
 

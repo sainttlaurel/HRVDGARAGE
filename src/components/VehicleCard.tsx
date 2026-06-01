@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
+import { getWebPUrl } from '../lib/imageUtils'
+import { trackVehicleDetailsView } from '../lib/analytics'
 
 interface VehicleCardProps {
   image: string
@@ -13,9 +15,20 @@ interface VehicleCardProps {
   specs: Record<string, string>
   index: number
   onViewDetails: () => void
+  vehicleId?: string
 }
 
-const VehicleCard = ({ image, images, brand, model, year, price, location, description, specs, index, onViewDetails }: VehicleCardProps) => {
+const VehicleCard = ({ image, images, brand, model, year, price, location, description, specs, index, onViewDetails, vehicleId }: VehicleCardProps) => {
+  const webpImage = getWebPUrl(image)
+
+  const handleViewDetails = () => {
+    // Track vehicle details view
+    if (vehicleId) {
+      trackVehicleDetailsView(vehicleId, brand, model)
+    }
+    onViewDetails()
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
@@ -26,13 +39,20 @@ const VehicleCard = ({ image, images, brand, model, year, price, location, descr
     >
       {/* Image Container */}
       <div className="relative aspect-[16/10] overflow-hidden">
-        <motion.img
-          src={image}
-          alt={`${brand} ${model}`}
-          className="w-full h-full object-cover"
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.6 }}
-        />
+        <picture>
+          <source
+            type="image/webp"
+            srcSet={webpImage}
+          />
+          <motion.img
+            src={image}
+            alt={`${brand} ${model}`}
+            className="w-full h-full object-cover"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.6 }}
+            loading="lazy"
+          />
+        </picture>
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60" />
         
         {/* Image Count Badge */}
@@ -49,7 +69,7 @@ const VehicleCard = ({ image, images, brand, model, year, price, location, descr
           className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center"
         >
           <motion.button
-            onClick={onViewDetails}
+            onClick={handleViewDetails}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             className="btn-primary"

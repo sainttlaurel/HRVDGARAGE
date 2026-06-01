@@ -12,9 +12,11 @@ import ThemeToggle from './components/ThemeToggle'
 import ToastContainer from './components/ToastContainer'
 import OfflineIndicator from './components/OfflineIndicator'
 import ErrorBoundary from './components/ErrorBoundary'
+import AnalyticsConsent from './components/AnalyticsConsent'
 import { loadFromSupabaseToLocalStorage, syncLocalStorageToSupabase } from './lib/syncToSupabase'
 import { initializeOfflineSupport } from './lib/offline'
 import { initializeDefaultData } from './lib/initializeData'
+import { initializeGoogleAnalytics, trackPageView } from './lib/analytics'
 
 // Lazy load heavy components
 const GalleryWall = lazy(() => import('./components/GalleryWall'))
@@ -31,6 +33,13 @@ function App() {
 
     // Initialize default data in localStorage
     initializeDefaultData()
+
+    // Check if user has already consented to analytics
+    const consentDecision = localStorage.getItem('analytics_consent')
+    if (consentDecision === 'accepted') {
+      initializeGoogleAnalytics()
+      trackPageView(window.location.pathname, document.title)
+    }
 
     // Sync data on app load
     const initializeData = async () => {
@@ -61,6 +70,13 @@ function App() {
     setIsAdminPage(false)
   }
 
+  const handleAnalyticsConsent = (accepted: boolean) => {
+    if (accepted) {
+      initializeGoogleAnalytics()
+      trackPageView(window.location.pathname, document.title)
+    }
+  }
+
   if (isAdminPage) {
     return (
       <ErrorBoundary>
@@ -79,6 +95,7 @@ function App() {
       <>
         <ToastContainer />
         <OfflineIndicator />
+        <AnalyticsConsent onConsent={handleAnalyticsConsent} />
         
         {/* Loading Screen */}
         {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}

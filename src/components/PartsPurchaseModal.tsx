@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { partOrdersService, Part } from '../lib/supabase'
 import { validatePartOrderForm, ValidationError, getFieldError } from '../lib/validation'
 import { sendNewPartOrderNotification } from '../lib/emailService'
+import { trackPartPurchase } from '../lib/analytics'
 
 interface PartsPurchaseModalProps {
   isOpen: boolean
@@ -71,6 +72,9 @@ const PartsPurchaseModal = ({ isOpen, onClose, part }: PartsPurchaseModalProps) 
         notes: formData.notes,
         status: 'new'
       })
+
+      // Track part purchase
+      trackPartPurchase(part.id, part.name, formData.quantity, part.price)
 
       // Send email notification to admin
       const emailSent = await sendNewPartOrderNotification({
