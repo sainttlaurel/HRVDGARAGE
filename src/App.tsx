@@ -31,10 +31,11 @@ const PAYWALL_ACTIVE = true
 function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [isAdminPage, setIsAdminPage] = useState(window.location.pathname === '/admin')
+  const [showPaywall, setShowPaywall] = useState(false)
 
   useEffect(() => {
     // Lock scroll when paywall is active
-    if (PAYWALL_ACTIVE) {
+    if (PAYWALL_ACTIVE && showPaywall) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'unset'
@@ -43,7 +44,7 @@ function App() {
     return () => {
       document.body.style.overflow = 'unset'
     }
-  }, [])
+  }, [showPaywall])
 
   useEffect(() => {
     // Initialize offline support
@@ -87,6 +88,10 @@ function App() {
 
   const handleLoadingComplete = () => {
     setIsLoading(false)
+    // Show paywall after loading screen completes
+    if (PAYWALL_ACTIVE) {
+      setShowPaywall(true)
+    }
   }
 
   const navigateHome = () => {
@@ -117,14 +122,14 @@ function App() {
   return (
     <ErrorBoundary>
       <>
-        {/* Paywall Overlay */}
-        <Paywall isActive={PAYWALL_ACTIVE} />
+        {/* Paywall Overlay - Shows after loading screen */}
+        <Paywall isActive={showPaywall} />
 
         <ToastContainer />
         <OfflineIndicator />
         <AnalyticsConsent onConsent={handleAnalyticsConsent} />
         
-        {/* Loading Screen */}
+        {/* Loading Screen - Shows first */}
         {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
 
         {/* Main Website */}
