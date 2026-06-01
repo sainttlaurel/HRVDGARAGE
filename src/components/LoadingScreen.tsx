@@ -71,7 +71,7 @@ const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
               onError={handleVideoError}
               className="absolute inset-0 w-full h-full object-cover"
             >
-              <source src="/video/LOADING SCREEN.mp4" type="video/mp4" />
+              <source src="/video/loading screeeeeeen.mp4" type="video/mp4" />
             </video>
           )}
 
