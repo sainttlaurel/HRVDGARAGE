@@ -180,15 +180,13 @@ export const loadFromSupabaseToLocalStorage = async () => {
         .order('created_at', { ascending: false })
       
       if (error) {
-        console.error('❌ Error loading inquiries from Supabase:', error)
+        console.warn('⚠️ Could not load inquiries from Supabase:', error.message)
       } else if (inquiries && inquiries.length > 0) {
         localStorage.setItem('inquiries', JSON.stringify(inquiries))
         console.log(`✅ Loaded ${inquiries.length} inquiries from Supabase`)
-      } else {
-        console.log('ℹ️ No inquiries in Supabase')
       }
     } catch (error) {
-      console.error('❌ Error loading inquiries:', error)
+      console.warn('⚠️ Error loading inquiries:', error)
     }
 
     // Load vehicles
@@ -199,13 +197,13 @@ export const loadFromSupabaseToLocalStorage = async () => {
         .order('created_at', { ascending: false })
       
       if (error) {
-        console.error('❌ Error loading vehicles from Supabase:', error)
+        console.warn('⚠️ Could not load vehicles from Supabase:', error.message)
       } else if (vehicles && vehicles.length > 0) {
         localStorage.setItem('vehicles', JSON.stringify(vehicles))
         console.log(`✅ Loaded ${vehicles.length} vehicles from Supabase`)
       }
     } catch (error) {
-      console.error('❌ Error loading vehicles:', error)
+      console.warn('⚠️ Error loading vehicles:', error)
     }
 
     // Load parts
@@ -216,13 +214,13 @@ export const loadFromSupabaseToLocalStorage = async () => {
         .order('created_at', { ascending: false })
       
       if (error) {
-        console.error('❌ Error loading parts from Supabase:', error)
+        console.warn('⚠️ Could not load parts from Supabase:', error.message)
       } else if (parts && parts.length > 0) {
         localStorage.setItem('parts', JSON.stringify(parts))
         console.log(`✅ Loaded ${parts.length} parts from Supabase`)
       }
     } catch (error) {
-      console.error('❌ Error loading parts:', error)
+      console.warn('⚠️ Error loading parts:', error)
     }
 
     // Load part orders
@@ -233,13 +231,13 @@ export const loadFromSupabaseToLocalStorage = async () => {
         .order('created_at', { ascending: false })
       
       if (error) {
-        console.error('❌ Error loading part orders from Supabase:', error)
+        console.warn('⚠️ Could not load part orders from Supabase:', error.message)
       } else if (partOrders && partOrders.length > 0) {
         localStorage.setItem('part_orders', JSON.stringify(partOrders))
         console.log(`✅ Loaded ${partOrders.length} part orders from Supabase`)
       }
     } catch (error) {
-      console.error('❌ Error loading part orders:', error)
+      console.warn('⚠️ Error loading part orders:', error)
     }
 
     // Load vehicle inquiries
@@ -250,17 +248,17 @@ export const loadFromSupabaseToLocalStorage = async () => {
         .order('created_at', { ascending: false })
       
       if (error) {
-        console.error('❌ Error loading vehicle inquiries from Supabase:', error)
+        console.warn('⚠️ Could not load vehicle inquiries from Supabase:', error.message)
       } else if (vehicleInquiries && vehicleInquiries.length > 0) {
         localStorage.setItem('vehicle_inquiries', JSON.stringify(vehicleInquiries))
         console.log(`✅ Loaded ${vehicleInquiries.length} vehicle inquiries from Supabase`)
       }
     } catch (error) {
-      console.error('❌ Error loading vehicle inquiries:', error)
+      console.warn('⚠️ Error loading vehicle inquiries:', error)
     }
 
     console.log('✅ Load from Supabase complete!')
   } catch (error) {
-    console.error('❌ Error during load:', error)
+    console.warn('⚠️ Error during load:', error)
   }
 }
