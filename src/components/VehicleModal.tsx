@@ -71,7 +71,7 @@ const VehicleModal = ({ isOpen, onClose, vehicle }: VehicleModalProps) => {
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-[70] flex items-center justify-center p-4"
           >
-            <div className="w-full h-screen bg-black border border-white/10 flex flex-col overflow-hidden">
+            <div className="w-full h-[70vh] max-w-7xl bg-black border border-white/10 flex flex-col overflow-hidden rounded-lg">
               {/* Close Button */}
               <button
                 onClick={onClose}
