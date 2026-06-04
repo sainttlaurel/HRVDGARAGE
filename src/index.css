@@ -58,15 +58,15 @@
   }
 
   .container-luxury {
-    @apply max-w-[1120px] mx-auto w-full px-6 lg:px-8;
+    @apply max-w-[1120px] mx-auto w-full px-4 sm:px-6 lg:px-8;
   }
 
   .heading-display {
-    @apply font-serif text-5xl md:text-7xl lg:text-8xl tracking-tight;
+    @apply font-serif text-3xl sm:text-5xl md:text-7xl lg:text-8xl tracking-tight;
   }
 
   .heading-section {
-    @apply font-serif text-4xl md:text-5xl lg:text-6xl tracking-tight;
+    @apply font-serif text-2xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight;
   }
 
   .nav-link {
@@ -74,15 +74,15 @@
   }
 
   .label-small {
-    @apply text-xs uppercase tracking-luxury opacity-60;
+    @apply text-[10px] sm:text-xs uppercase tracking-luxury opacity-60;
   }
 
   .btn-primary {
-    @apply px-8 py-4 border border-foreground text-foreground font-medium text-sm uppercase tracking-luxury transition-all duration-300 hover:bg-foreground hover:text-background;
+    @apply px-4 sm:px-8 py-2 sm:py-4 min-h-[44px] min-w-[44px] border border-foreground text-foreground font-medium text-xs sm:text-sm uppercase tracking-luxury transition-all duration-300 hover:bg-foreground hover:text-background;
   }
 
   .btn-secondary {
-    @apply px-8 py-4 bg-motorsport-red text-foreground font-medium text-sm uppercase tracking-luxury transition-all duration-300 hover:bg-opacity-80;
+    @apply px-4 sm:px-8 py-2 sm:py-4 min-h-[44px] min-w-[44px] bg-motorsport-red text-foreground font-medium text-xs sm:text-sm uppercase tracking-luxury transition-all duration-300 hover:bg-opacity-80;
   }
 
   .card-luxury {

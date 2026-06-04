@@ -43,12 +43,12 @@ const Hero = () => {
       </AnimatePresence>
 
       {/* Image Indicators */}
-      <div className="absolute bottom-32 right-8 z-20 flex flex-col gap-2">
+      <div className="absolute bottom-8 sm:bottom-32 right-4 sm:right-8 z-20 flex flex-col gap-2">
         {heroImages.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentImageIndex(index)}
-            className={`w-1 h-8 rounded-full transition-all ${
+            className={`w-1 h-6 sm:h-8 rounded-full transition-all ${
               index === currentImageIndex
                 ? 'bg-motorsport-red'
                 : 'bg-foreground-faint hover:bg-foreground-muted'
@@ -58,13 +58,13 @@ const Hero = () => {
       </div>
 
       {/* Content */}
-      <div className="container-luxury relative z-20 pt-20">
+      <div className="container-luxury relative z-20 pt-12 sm:pt-20">
         <div className="max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
-            className="space-y-6"
+            className="space-y-4 sm:space-y-6"
           >
             <p className="label-small">Premium Pre-Owned Vehicles & Performance Parts</p>
             
@@ -72,17 +72,18 @@ const Hero = () => {
               Built Different, Driven Better
             </h1>
             
-            <p className="text-xl md:text-2xl text-foreground-muted max-w-2xl">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground-muted max-w-2xl">
               Curated collection of modified vehicles and performance parts. 
               From daily drivers to off-road beasts – all verified, all exceptional.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-8">
-              <a href="#inventory" className="btn-primary group">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-6 sm:pt-8">
+              <a href="#inventory" className="btn-primary group text-xs sm:text-sm">
                 Explore Inventory
-                <ArrowUpRight className="inline-block ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" size={18} />
+                <ArrowUpRight className="inline-block ml-1 sm:ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform sm:hidden" size={16} />
+                <ArrowUpRight className="hidden sm:inline-block ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" size={18} />
               </a>
-              <a href="#parts" className="btn-secondary">
+              <a href="#parts" className="btn-secondary text-xs sm:text-sm">
                 Browse Parts
               </a>
             </div>
@@ -94,12 +95,12 @@ const Hero = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 1 }}
-          className="absolute bottom-12 left-1/2 -translate-x-1/2"
+          className="absolute bottom-4 sm:bottom-12 left-1/2 -translate-x-1/2"
         >
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ repeat: Infinity, duration: 2 }}
-            className="w-px h-16 bg-gradient-to-b from-transparent via-foreground to-transparent"
+            className="w-px h-12 sm:h-16 bg-gradient-to-b from-transparent via-foreground to-transparent"
           />
         </motion.div>
       </div>
