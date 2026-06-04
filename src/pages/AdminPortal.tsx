@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { LogOut, Menu, X, Package, MessageSquare, Settings, Wrench, ShoppingCart, RefreshCw } from 'lucide-react'
+import { LogOut, Menu, X, Package, MessageSquare, Settings, Wrench, ShoppingCart, RefreshCw, Activity } from 'lucide-react'
 import AdminInquiries from '../components/admin/AdminInquiries'
 import AdminInventory from '../components/admin/AdminInventory'
 import AdminParts from '../components/admin/AdminParts'
 import AdminPartOrders from '../components/admin/AdminPartOrders'
 import AdminSettings from '../components/admin/AdminSettings'
+import PerformanceMonitor from '../components/PerformanceMonitor'
 import Toast from '../components/Toast'
 import { supabase } from '../lib/supabase'
 import { loadFromSupabaseToLocalStorage, syncLocalStorageToSupabase } from '../lib/syncToSupabase'
@@ -19,7 +20,7 @@ const AdminPortal = ({ onNavigateHome }: AdminPortalProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [activeTab, setActiveTab] = useState<'inquiries' | 'inventory' | 'parts' | 'orders' | 'settings'>('inquiries')
+  const [activeTab, setActiveTab] = useState<'inquiries' | 'inventory' | 'parts' | 'orders' | 'settings' | 'performance'>('inquiries')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
@@ -282,6 +283,16 @@ const AdminPortal = ({ onNavigateHome }: AdminPortalProps) => {
             </button>
 
             <button
+              onClick={() => setActiveTab('performance')}
+              className={`flex items-center gap-2 label-small transition-opacity ${
+                activeTab === 'performance' ? 'opacity-100' : 'opacity-60 hover:opacity-100'
+              }`}
+            >
+              <Activity size={18} />
+              Performance
+            </button>
+
+            <button
               onClick={handleLogout}
               className="flex items-center gap-2 label-small opacity-60 hover:opacity-100 transition-opacity"
             >
@@ -360,6 +371,15 @@ const AdminPortal = ({ onNavigateHome }: AdminPortalProps) => {
                 Settings
               </button>
               <button
+                onClick={() => {
+                  setActiveTab('performance')
+                  setMobileMenuOpen(false)
+                }}
+                className="block w-full text-left label-small opacity-60 hover:opacity-100"
+              >
+                Performance
+              </button>
+              <button
                 onClick={handleLogout}
                 className="block w-full text-left label-small opacity-60 hover:opacity-100"
               >
@@ -378,6 +398,7 @@ const AdminPortal = ({ onNavigateHome }: AdminPortalProps) => {
           {activeTab === 'parts' && <AdminParts />}
           {activeTab === 'orders' && <AdminPartOrders />}
           {activeTab === 'settings' && <AdminSettings />}
+          {activeTab === 'performance' && <PerformanceMonitor />}
         </div>
       </main>
 
