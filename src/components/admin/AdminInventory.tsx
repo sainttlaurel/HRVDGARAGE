@@ -14,6 +14,7 @@ const AdminInventory = () => {
   const [editForm, setEditForm] = useState<Partial<Vehicle>>({})
   const [loading, setLoading] = useState(true)
   const [showPhotoManager, setShowPhotoManager] = useState(false)
+  const [showAddForm, setShowAddForm] = useState(false)
   const [newPhotoUrl, setNewPhotoUrl] = useState('')
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const [searchTerm, setSearchTerm] = useState('')
@@ -21,6 +22,18 @@ const AdminInventory = () => {
   const [sortBy, setSortBy] = useState<'date' | 'name' | 'price'>('date')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [stats, setStats] = useState({ total: 0, available: 0, sold: 0 })
+  const [newVehicle, setNewVehicle] = useState<Partial<Vehicle>>({
+    brand: '',
+    model: '',
+    year: new Date().getFullYear(),
+    price: '',
+    location: '',
+    description: '',
+    image: '',
+    images: [],
+    specs: {},
+    available: true
+  })
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
@@ -91,6 +104,45 @@ const AdminInventory = () => {
       }
     } catch (error) {
       console.error('Error toggling availability:', error)
+    }
+  }
+
+  const addNewVehicle = async () => {
+    if (!newVehicle.brand || !newVehicle.model || !newVehicle.price) {
+      alert('Please fill in all required fields (Brand, Model, Price)')
+      return
+    }
+
+    try {
+      const created = await vehicleService.create({
+        brand: newVehicle.brand || '',
+        model: newVehicle.model || '',
+        year: newVehicle.year || new Date().getFullYear(),
+        price: newVehicle.price || '',
+        location: newVehicle.location || '',
+        description: newVehicle.description || '',
+        image: newVehicle.image || '/image/cars/placeholder.jpg',
+        images: newVehicle.image ? [newVehicle.image] : ['/image/cars/placeholder.jpg'],
+        specs: {},
+        available: newVehicle.available !== false
+      })
+      setVehicles([created, ...vehicles])
+      setNewVehicle({
+        brand: '',
+        model: '',
+        year: new Date().getFullYear(),
+        price: '',
+        location: '',
+        description: '',
+        image: '',
+        images: [],
+        specs: {},
+        available: true
+      })
+      setShowAddForm(false)
+      setStats(getVehicleStats([created, ...vehicles]))
+    } catch (error) {
+      console.error('Error adding vehicle:', error)
     }
   }
 
@@ -324,7 +376,10 @@ const AdminInventory = () => {
             <Download size={16} />
             <span className="hidden sm:inline">Export</span>
           </button>
-          <button className="btn-secondary flex items-center gap-2">
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="btn-secondary flex items-center gap-2"
+          >
             <Plus size={18} />
             <span className="hidden sm:inline">Add Vehicle</span>
           </button>
@@ -416,6 +471,113 @@ const AdminInventory = () => {
           Sold
         </button>
       </div>
+
+      {/* Add New Vehicle Form */}
+      {showAddForm && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card-luxury p-6 space-y-4 mb-6"
+        >
+          <h3 className="font-serif text-xl mb-4">Add New Vehicle</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="label-small block mb-2">Brand *</label>
+              <input
+                type="text"
+                value={newVehicle.brand || ''}
+                onChange={(e) => setNewVehicle({ ...newVehicle, brand: e.target.value })}
+                className="w-full bg-background border border-border px-3 py-2 text-sm"
+                placeholder="e.g., Porsche"
+              />
+            </div>
+
+            <div>
+              <label className="label-small block mb-2">Model *</label>
+              <input
+                type="text"
+                value={newVehicle.model || ''}
+                onChange={(e) => setNewVehicle({ ...newVehicle, model: e.target.value })}
+                className="w-full bg-background border border-border px-3 py-2 text-sm"
+                placeholder="e.g., 911 GT3 RS"
+              />
+            </div>
+
+            <div>
+              <label className="label-small block mb-2">Year *</label>
+              <input
+                type="number"
+                value={newVehicle.year || ''}
+                onChange={(e) => setNewVehicle({ ...newVehicle, year: parseInt(e.target.value) || new Date().getFullYear() })}
+                className="w-full bg-background border border-border px-3 py-2 text-sm"
+                placeholder="e.g., 2024"
+              />
+            </div>
+
+            <div>
+              <label className="label-small block mb-2">Price *</label>
+              <input
+                type="text"
+                value={newVehicle.price || ''}
+                onChange={(e) => setNewVehicle({ ...newVehicle, price: e.target.value })}
+                className="w-full bg-background border border-border px-3 py-2 text-sm"
+                placeholder="₱15,500,000"
+              />
+            </div>
+
+            <div>
+              <label className="label-small block mb-2">Location</label>
+              <input
+                type="text"
+                value={newVehicle.location || ''}
+                onChange={(e) => setNewVehicle({ ...newVehicle, location: e.target.value })}
+                className="w-full bg-background border border-border px-3 py-2 text-sm"
+                placeholder="e.g., Quezon City"
+              />
+            </div>
+
+            <div>
+              <label className="label-small block mb-2">Image URL</label>
+              <input
+                type="text"
+                value={newVehicle.image || ''}
+                onChange={(e) => setNewVehicle({ ...newVehicle, image: e.target.value })}
+                className="w-full bg-background border border-border px-3 py-2 text-sm"
+                placeholder="/image/cars/sample.jpg"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="label-small block mb-2">Description</label>
+            <textarea
+              value={newVehicle.description || ''}
+              onChange={(e) => setNewVehicle({ ...newVehicle, description: e.target.value })}
+              className="w-full bg-background border border-border px-3 py-2 text-sm resize-none"
+              rows={3}
+              placeholder="Vehicle description..."
+            />
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              onClick={addNewVehicle}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-500/20 text-green-400 rounded-sm hover:bg-green-500/30"
+            >
+              <Save size={18} />
+              Add Vehicle
+            </button>
+            <button
+              onClick={() => setShowAddForm(false)}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-foreground-faint/20 text-foreground-muted rounded-sm hover:bg-foreground-faint/30"
+            >
+              <X size={18} />
+              Cancel
+            </button>
+          </div>
+        </motion.div>
+      )}
 
       {/* Responsive Grid - 1 col on mobile, 2 on tablet, 3 on desktop */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
