@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import VehicleCard from './VehicleCard'
 import VehicleModal from './VehicleModal'
 import { subscribeToTable, loadInitialData } from '../lib/realtimeSubscriptions'
-import { onDataChange, onStorageChange } from '../lib/dataEvents'
+import { onDataChange } from '../lib/dataEvents'
 import { vehicleService } from '../lib/supabase'
 
 interface Vehicle {
@@ -162,23 +162,16 @@ const Inventory = () => {
       setVehicles((updatedVehicles.length > 0 ? updatedVehicles : defaultVehicles) as Vehicle[])
     })
 
-    // Subscribe to custom data events (same-tab admin changes — always works)
+    // Admin CRUD in same session (navigate home after edit)
     const unsubscribeDataChange = onDataChange('vehicles', () => {
       reloadVehicles()
     })
 
-    // Subscribe to cross-tab localStorage changes (admin in different tab)
-    const unsubscribeStorage = onStorageChange('vehicles', () => {
-      reloadVehicles()
-    })
-
-    // Cleanup all subscriptions on unmount
     return () => {
       if (subscription) {
         subscription.unsubscribe()
       }
       unsubscribeDataChange()
-      unsubscribeStorage()
     }
   }, [reloadVehicles])
 

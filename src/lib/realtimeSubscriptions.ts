@@ -85,7 +85,7 @@ const fetchAndUpdateTable = async (
     const { data, error } = await supabase
       .from(tableName)
       .select('*')
-      .order('created_at', { ascending: false })
+      .order('createdAt', { ascending: false })
 
     if (error) {
       console.error(`❌ Error fetching ${tableName}:`, error)
@@ -145,7 +145,7 @@ export const loadInitialData = async (tableName: TableName): Promise<Record<stri
         const { data, error } = await supabase!
           .from(tableName)
           .select('*')
-          .order('created_at', { ascending: false })
+          .order('createdAt', { ascending: false })
         clearTimeout(timer)
         if (error) {
           console.error(`❌ Error loading ${tableName}:`, error)
@@ -182,7 +182,7 @@ const scheduleBackgroundRetry = (tableName: TableName) => {
       const { data, error } = await supabase
         .from(tableName)
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('createdAt', { ascending: false })
 
       if (!error && data) {
         console.log(`🔄 Background retry loaded ${tableName} (${data.length} items)`)

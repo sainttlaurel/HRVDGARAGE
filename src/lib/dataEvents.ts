@@ -55,25 +55,3 @@ export const onDataChange = (
     window.removeEventListener(DATA_CHANGE_EVENT, handler)
   }
 }
-
-/**
- * Listen for cross-tab localStorage changes (e.g. admin in one tab, website in another)
- * Returns a cleanup function
- */
-export const onStorageChange = (
-  type: DataEventType,
-  callback: () => void
-): (() => void) => {
-  const handler = (e: StorageEvent) => {
-    if (e.key === type && e.newValue !== e.oldValue) {
-      console.log(`📡 Cross-tab storage change detected: ${type}`)
-      callback()
-    }
-  }
-
-  window.addEventListener('storage', handler)
-  
-  return () => {
-    window.removeEventListener('storage', handler)
-  }
-}

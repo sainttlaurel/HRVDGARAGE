@@ -38,7 +38,7 @@ async function fetchAllRows<T>(table: string): Promise<T[]> {
   const { data, error } = await supabase
     .from(table)
     .select('*')
-    .order('created_at', { ascending: false })
+    .order('createdAt', { ascending: false })
   if (error) throw error
   return (data as T[]) ?? []
 }

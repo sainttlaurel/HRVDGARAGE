@@ -14,9 +14,7 @@ import ToastContainer from './components/ToastContainer'
 import OfflineIndicator from './components/OfflineIndicator'
 import ErrorBoundary from './components/ErrorBoundary'
 import AnalyticsConsent from './components/AnalyticsConsent'
-import { loadFromSupabaseToLocalStorage, syncLocalStorageToSupabase } from './lib/syncToSupabase'
 import { initializeOfflineSupport } from './lib/offline'
-import { initializeDefaultData } from './lib/initializeData'
 import { initializeGoogleAnalytics, trackPageView } from './lib/analytics'
 import { updateMetaTags, setCanonicalURL, addOrganizationSchema, addLocalBusinessSchema, DEFAULT_SEO_CONFIG } from './lib/seo'
 import { initializePerformanceMonitoring } from './lib/performanceMonitoring'
@@ -54,9 +52,6 @@ function App() {
     // Initialize offline support
     initializeOfflineSupport()
 
-    // Initialize default data in localStorage
-    initializeDefaultData()
-
     // Initialize SEO
     updateMetaTags(DEFAULT_SEO_CONFIG)
     setCanonicalURL('https://sacredgarage.com/')
@@ -70,15 +65,6 @@ function App() {
       trackPageView(window.location.pathname, document.title)
     }
 
-    // Sync data on app load
-    const initializeData = async () => {
-      // First, load from Supabase to get latest data
-      await loadFromSupabaseToLocalStorage()
-      // Then, sync any local changes back to Supabase
-      await syncLocalStorageToSupabase()
-    }
-    
-    initializeData()
   }, [])
 
   useEffect(() => {

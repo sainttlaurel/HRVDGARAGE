@@ -5,7 +5,7 @@ import PartModal from './PartModal'
 import PartsPurchaseModal from './PartsPurchaseModal'
 import { Part, partsService } from '../lib/supabase'
 import { subscribeToTable, loadInitialData } from '../lib/realtimeSubscriptions'
-import { onDataChange, onStorageChange } from '../lib/dataEvents'
+import { onDataChange } from '../lib/dataEvents'
 
 const defaultParts: Part[] = [
   {
@@ -120,23 +120,15 @@ const Parts = () => {
       setParts((updatedParts.length > 0 ? updatedParts : defaultParts) as Part[])
     })
 
-    // Subscribe to custom data events (same-tab admin changes — always works)
     const unsubscribeDataChange = onDataChange('parts', () => {
       reloadParts()
     })
 
-    // Subscribe to cross-tab localStorage changes (admin in different tab)
-    const unsubscribeStorage = onStorageChange('parts', () => {
-      reloadParts()
-    })
-
-    // Cleanup all subscriptions on unmount
     return () => {
       if (subscription) {
         subscription.unsubscribe()
       }
       unsubscribeDataChange()
-      unsubscribeStorage()
     }
   }, [reloadParts])
 
