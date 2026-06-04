@@ -167,7 +167,7 @@ const AdminInquiries = () => {
               <div>
                 <p className="label-small mb-1">Date</p>
                 <p className="text-xs text-foreground-muted">
-                  {new Date(selectedInquiry.createdAt).toLocaleDateString()}
+                  {new Date(selectedInquiry.createdat).toLocaleDateString()}
                 </p>
               </div>
             </div>
@@ -322,7 +322,7 @@ const AdminInquiries = () => {
                     <p className="text-xs sm:text-sm text-foreground-muted mb-2 truncate">{inquiry.email}</p>
                     <p className="text-xs sm:text-sm line-clamp-2">{inquiry.message}</p>
                     <p className="text-xs text-foreground-faint mt-2">
-                      {new Date(inquiry.createdAt).toLocaleDateString()}
+                      {new Date(inquiry.createdat).toLocaleDateString()}
                     </p>
                   </div>
                   <Eye size={16} className="opacity-60 flex-shrink-0 mt-1" />

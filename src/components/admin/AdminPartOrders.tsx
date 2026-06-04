@@ -104,8 +104,8 @@ const AdminPartOrders = () => {
         break
       case 'date':
       default:
-        compareA = new Date(a.createdAt).getTime()
-        compareB = new Date(b.createdAt).getTime()
+        compareA = new Date(a.createdat).getTime()
+        compareB = new Date(b.createdat).getTime()
     }
 
     if (compareA < compareB) return sortOrder === 'asc' ? -1 : 1
@@ -235,7 +235,7 @@ const AdminPartOrders = () => {
                     </span>
                   </div>
                   <p className="text-sm text-foreground-muted">
-                    Order ID: {order.id} • {new Date(order.createdAt).toLocaleDateString()}
+                    Order ID: {order.id} • {new Date(order.createdat).toLocaleDateString()}
                   </p>
                 </div>
                 <button

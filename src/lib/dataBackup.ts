@@ -143,7 +143,7 @@ export const exportVehicles = (vehicles: Vehicle[]) => {
     location: v.location,
     description: v.description,
     available: v.available,
-    createdAt: v.createdAt
+    createdat: v.createdat
   }))
 
   exportToCSV(data, 'vehicles-backup')
@@ -162,7 +162,7 @@ export const exportParts = (parts: Part[]) => {
     condition: p.condition,
     description: p.description,
     available: p.available,
-    createdAt: p.createdAt
+    createdat: p.createdat
   }))
 
   exportToCSV(data, 'parts-backup')
@@ -180,7 +180,7 @@ export const exportInquiries = (inquiries: Inquiry[]) => {
     phone: i.phone,
     message: i.message,
     status: i.status,
-    createdAt: i.createdAt
+    createdat: i.createdat
   }))
 
   exportToCSV(data, 'inquiries-backup')
@@ -198,7 +198,7 @@ export const exportPartOrders = (orders: PartOrder[]) => {
     customerName: o.customerName,
     customerEmail: o.customerEmail,
     status: o.status,
-    createdAt: o.createdAt
+    createdat: o.createdat
   }))
 
   exportToCSV(data, 'part-orders-backup')

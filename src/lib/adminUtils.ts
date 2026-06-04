@@ -68,8 +68,8 @@ export function sortInquiries(
         break
       case 'date':
       default:
-        compareA = new Date(a.createdAt).getTime()
-        compareB = new Date(b.createdAt).getTime()
+        compareA = new Date(a.createdat).getTime()
+        compareB = new Date(b.createdat).getTime()
     }
 
     if (compareA < compareB) return sortOrder === 'asc' ? -1 : 1
@@ -139,8 +139,8 @@ export function sortVehicles(
         break
       case 'date':
       default:
-        compareA = new Date(a.createdAt).getTime()
-        compareB = new Date(b.createdAt).getTime()
+        compareA = new Date(a.createdat).getTime()
+        compareB = new Date(b.createdat).getTime()
     }
 
     if (compareA < compareB) return sortOrder === 'asc' ? -1 : 1
@@ -207,8 +207,8 @@ export function sortParts(
         break
       case 'date':
       default:
-        compareA = new Date(a.createdAt).getTime()
-        compareB = new Date(b.createdAt).getTime()
+        compareA = new Date(a.createdat).getTime()
+        compareB = new Date(b.createdat).getTime()
     }
 
     if (compareA < compareB) return sortOrder === 'asc' ? -1 : 1
@@ -273,7 +273,7 @@ export function exportInquiries(inquiries: Inquiry[]) {
     Phone: inq.phone,
     Message: inq.message,
     Status: inq.status,
-    'Created At': new Date(inq.createdAt).toLocaleDateString(),
+    'Created At': new Date(inq.createdat).toLocaleDateString(),
   }))
 
   exportToCSV(data, 'inquiries')
@@ -291,7 +291,7 @@ export function exportVehicles(vehicles: Vehicle[]) {
     Location: v.location,
     Available: v.available ? 'Yes' : 'No',
     Description: v.description,
-    'Created At': new Date(v.createdAt).toLocaleDateString(),
+    'Created At': new Date(v.createdat).toLocaleDateString(),
   }))
 
   exportToCSV(data, 'vehicles')
@@ -309,7 +309,7 @@ export function exportParts(parts: Part[]) {
     Condition: p.condition,
     Available: p.available ? 'Yes' : 'No',
     Description: p.description,
-    'Created At': new Date(p.createdAt).toLocaleDateString(),
+    'Created At': new Date(p.createdat).toLocaleDateString(),
   }))
 
   exportToCSV(data, 'parts')
@@ -327,7 +327,7 @@ export function exportPartOrders(orders: PartOrder[]) {
     'Customer Phone': o.customerPhone,
     'Delivery Option': o.deliveryOption,
     Status: o.status,
-    'Created At': new Date(o.createdAt).toLocaleDateString(),
+    'Created At': new Date(o.createdat).toLocaleDateString(),
   }))
 
   exportToCSV(data, 'part-orders')
