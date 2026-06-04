@@ -174,8 +174,8 @@ export const exportParts = (parts: Part[]) => {
 export const exportInquiries = (inquiries: Inquiry[]) => {
   const data = inquiries.map((i) => ({
     id: i.id,
-    firstName: i.firstName,
-    lastName: i.lastName,
+    firstname: i.firstname,
+    lastname: i.lastname,
     email: i.email,
     phone: i.phone,
     message: i.message,

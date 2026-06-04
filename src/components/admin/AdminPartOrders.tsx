@@ -88,7 +88,7 @@ const AdminPartOrders = () => {
       o.partname.toLowerCase().includes(term) ||
       o.customername.toLowerCase().includes(term) ||
       o.customeremail.toLowerCase().includes(term) ||
-      o.customerPhone.includes(term)
+      o.customerphone.includes(term)
     )
   })
 
@@ -99,8 +99,8 @@ const AdminPartOrders = () => {
 
     switch (sortBy) {
       case 'name':
-        compareA = a.customerName.toLowerCase()
-        compareB = b.customerName.toLowerCase()
+        compareA = a.customername.toLowerCase()
+        compareB = b.customername.toLowerCase()
         break
       case 'date':
       default:

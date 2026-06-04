@@ -324,7 +324,7 @@ export function exportPartOrders(orders: PartOrder[]) {
     Quantity: o.quantity,
     'Customer Name': o.customername,
     'Customer Email': o.customeremail,
-    'Customer Phone': o.customerPhone,
+    'Customer Phone': o.customerphone,
     'Delivery Option': o.deliveryoption,
     Status: o.status,
     'Created At': new Date(o.createdat).toLocaleDateString(),
