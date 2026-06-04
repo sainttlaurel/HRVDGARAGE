@@ -102,11 +102,11 @@ const VehicleModal = ({ isOpen, onClose, vehicle }: VehicleModalProps) => {
 
                 {/* Gallery Section */}
                 <div className="mb-8">
-                  <div className="mb-4 border border-white/20 aspect-video bg-black overflow-hidden rounded">
+                  <div className="mb-4 border border-white/20 aspect-video bg-black overflow-hidden rounded flex items-center justify-center">
                     <img
                       src={vehicle.images[selectedImageIndex] || vehicle.image}
                       alt={`${vehicle.brand} ${vehicle.model}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover scale-80 origin-center"
                     />
                   </div>
 
