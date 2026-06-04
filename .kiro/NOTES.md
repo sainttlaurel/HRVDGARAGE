@@ -1,128 +1,59 @@
-# Project Status — HRVD Car Trading (Sacred Garage)
+# HRVD Car Trading — Project Notes
 
-**Repo:** [sainttlaurel/HRVDGARAGE](https://github.com/sainttlaurel/HRVDGARAGE/tree/main)  
-**Live:** [sacredgarage.vercel.app](https://sacredgarage.vercel.app)  
-**Last Updated:** June 5, 2026  
-**Latest on `main`:** `3d20a0a` (pushed to GitHub)
-
----
-
-## What we changed (June 5, 2026)
-
-### Supabase as source of truth (listings)
-- **Reads** for vehicles, parts, inquiries, orders, settings come from Supabase only — no `localStorage` read fallback.
-- Shared helpers in `supabase.ts`: `fetchAllRows`, `fetchRowById`, `fetchSingleRow`.
-- `loadInitialData()` fetches from Supabase only; returns `[]` on failure (background retry via `dataEvents`).
-- List queries order by **`createdAt`** (matches insert fields).
-
-### Admin → main website sync (no localStorage for listings)
-- Admin CRUD dispatches **`dispatchDataChange()`** (`dataEvents.ts`).
-- Public **Inventory** / **Parts** listen to:
-  1. **Supabase Realtime** (cross-tab, all visitors)
-  2. **`onDataChange`** (same browser after admin edit → navigate home)
-- Removed **`onStorageChange`** / cross-tab `localStorage` listeners.
-
-### Admin portal simplified
-- **Removed:** “Supabase connected” indicator, **Sync** button, **Performance** tab.
-- **Removed files:** `SupabaseConnectionIndicator.tsx`, `supabaseConnection.ts`, `initializeData.ts`.
-- **Nav:** Vehicles → Parts → Inquiries → Orders → Settings → Logout.
-- **Default tab:** Vehicles.
-- **Settings:** loads/saves `business_settings` in Supabase; stats from live queries.
-
-### App startup cleaned up
-- **Removed** from `App.tsx`: `initializeDefaultData()`, `loadFromSupabaseToLocalStorage()`, `syncLocalStorageToSupabase()` on every page load.
-
-### Git
-- `5237c81` — Supabase read SSOT + `dataEvents` + admin Settings on cloud.
-- `3d20a0a` — Admin simplification + drop listing `localStorage` sync + `supabase/setup.sql`.
-- Pushed to [HRVDGARAGE `main`](https://github.com/sainttlaurel/HRVDGARAGE/tree/main).
-- Local `origin` may still point at `sacredgarage` — use `git push https://github.com/sainttlaurel/HRVDGARAGE.git main` or update remote URL.
+**Repo:** [sainttlaurel/HRVDGARAGE](https://github.com/sainttlaurel/HRVDGARAGE)
+**Live:** [sacredgarage-sainttlaurels-projects.vercel.app](https://sacredgarage-sainttlaurels-projects.vercel.app)
+**Stack:** React + TypeScript + Vite + Tailwind + Supabase + Vercel
 
 ---
 
-## What we added
+## Supabase
 
-| Item | Purpose |
-|------|---------|
-| `src/lib/dataEvents.ts` | Custom event bus for admin → public refresh |
-| `supabase/setup.sql` | Table definitions + RLS policies (run in Supabase SQL Editor; use **Run and enable RLS**) |
-| `.kiro/NOTES.md` | This file (project status) |
+**Project URL:** `https://opfhikdkqfveoweqxqia.supabase.co`
+**Key:** `VITE_SUPABASE_PUBLISHABLE_KEY` (set in Vercel env vars)
+
+### Tables & column naming
+All columns are **fully lowercase** (no camelCase). Key columns: `createdat`, `updatedat`, `firstname`, `lastname`, `customername`, etc.
+
+| Table | Public access | Admin access |
+|-------|--------------|--------------|
+| `vehicles` | Read | Full CRUD |
+| `parts` | Read | Full CRUD |
+| `inquiries` | Insert | Full CRUD |
+| `part_orders` | Insert | Full CRUD |
+| `vehicle_inquiries` | Insert | Full CRUD |
+| `business_settings` | — | Full CRUD |
+
+### RLS policies
+- Public read on `vehicles` and `parts`
+- Public insert on `inquiries`, `part_orders`, `vehicle_inquiries`
+- Authenticated full access on all tables
+- **Realtime broadcast triggers removed** — were causing insert failures (`realtime.send` error)
 
 ---
 
-## How data flows now
+## Architecture
 
 ```
-Admin saves vehicle/part → Supabase DB
-                              ↓
-         Realtime subscription → public Inventory / Parts update
-         (or reload on navigate home via dataEvents)
+Admin adds vehicle/part → Supabase DB → public site reads on load
 ```
 
-**Still uses `localStorage` (OK):** theme, analytics consent.  
-**Still uses `localStorage` on write failure:** `supabase.ts` create/update/delete fallbacks if Supabase errors.  
-**Empty database:** Public Inventory/Parts show the “no listings” empty state until you add rows in admin or Supabase.
+- **No localStorage** for listings — Supabase is the single source of truth
+- **localStorage** still used for: theme preference, analytics consent
+- **dataEvents.ts** — event bus for same-session admin → public refresh
+- **Realtime disabled** — not needed, simple refresh on load is enough
 
 ---
 
-## ✅ Already done (summary)
+## Environment variables
 
-- Public site: hero, inventory, parts, contact, SEO, admin auth, mobile layout.
-- Admin: full CRUD for vehicles, parts, inquiries, orders, settings.
-- Code quality: TypeScript + ESLint clean; Vite build passes.
-- Real-time sync path: Realtime + `dataEvents` (no listing sync via `localStorage`).
-
----
-
-## 📋 Still need to do
-
-### Supabase (dashboard — one-time)
-
-- [ ] Run `supabase/setup.sql` in **SQL Editor** (choose **Run and enable RLS** when prompted).
-- [ ] **Database → Replication** — enable Realtime for **`vehicles`** and **`parts`**.
-- [ ] **Authentication** — create admin user(s).
-- [ ] Confirm tables have **`createdAt`** / **`updatedAt`** columns (camelCase) or adjust `setup.sql` / app to match your existing schema.
-- [ ] Seed data: Admin → **Vehicles** / **Parts**, or Supabase Table Editor.
-
-### Vercel
-
-- [ ] Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (Production + Preview).
-- [ ] Redeploy after env vars.
-- [ ] Smoke test: public listings + admin login + add/edit vehicle.
-
-### Main website (optional improvements)
-
-- [x] Empty DB: show “no listings” instead of demo cars/parts (Supabase-only, no hardcoded fallback).
-- [ ] Load footer/contact copy from `business_settings` on public site.
-- [ ] Wire or remove unused **reviews** components.
-- [ ] Form sanitization + rate limiting on contact/orders.
-
-### Admin (optional improvements)
-
-- [ ] Test all CRUD against **live** Supabase (not write fallbacks).
-- [ ] Remove write `localStorage` fallbacks in `supabase.ts` once RLS + auth are stable.
-- [ ] Add or delete unused `AdminBackup.tsx`.
-- [ ] Optional: analytics dashboard, advanced filters.
-
-### DevOps
-
-- [ ] Point `git remote` at HRVDGARAGE for everyday `git push` (optional).
-
----
-
-## Supabase tables the app expects
-
-| Table | Public | Admin |
-|-------|--------|-------|
-| `vehicles` | Read | CRUD |
-| `parts` | Read | CRUD |
-| `inquiries` | Insert (contact) | Manage |
-| `part_orders` | Insert | Manage |
-| `vehicle_inquiries` | Insert | Manage |
-| `business_settings` | Read (future) | CRUD |
-| `reviews` | Optional (not in App) | No UI yet |
-
-**Env vars:** see `.env.example`.
+| Variable | Where |
+|----------|-------|
+| `VITE_SUPABASE_URL` | Vercel + `.env.local` |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Vercel + `.env.local` |
+| `VITE_RESEND_API_KEY` | `.env.local` only |
+| `VITE_ADMIN_EMAIL` | `.env.local` only |
+| `VITE_FROM_EMAIL` | `.env.local` only |
+| `VITE_GA_TRACKING_ID` | Optional — set real GA4 ID or leave blank |
 
 ---
 
@@ -130,27 +61,20 @@ Admin saves vehicle/part → Supabase DB
 
 | File | Role |
 |------|------|
-| `src/lib/supabase.ts` | Client + services + Supabase-only reads |
-| `src/lib/dataEvents.ts` | Admin → public event bus |
-| `src/lib/realtimeSubscriptions.ts` | Realtime + initial load |
-| `src/lib/syncToSupabase.ts` | Legacy bidirectional sync (no longer called on app boot) |
-| `src/pages/AdminPortal.tsx` | Simplified admin shell |
-| `src/components/admin/AdminInventory.tsx` | Vehicles CRUD + `dispatchDataChange` |
-| `src/components/admin/AdminParts.tsx` | Parts CRUD + `dispatchDataChange` |
-| `src/components/admin/AdminSettings.tsx` | Business settings + stats |
-| `supabase/setup.sql` | DB + RLS setup script |
+| `src/lib/supabase.ts` | Supabase client + all service functions |
+| `src/lib/dataEvents.ts` | Admin → public refresh event bus |
+| `src/lib/realtimeSubscriptions.ts` | Disabled (noop stubs) |
+| `src/lib/validation.ts` | Form validation |
+| `src/lib/emailService.ts` | Resend email notifications |
+| `src/pages/AdminPortal.tsx` | Admin shell + Supabase auth |
+| `supabase/setup.sql` | DB schema + RLS setup script |
 
 ---
 
-## Pre-deploy checklist
+## To do
 
-- [x] Code on GitHub `main` (`3d20a0a`)
-- [x] Admin simplified; listing sync via Supabase + events
-- [ ] Vercel Supabase env vars
-- [ ] `setup.sql` + RLS + Realtime in Supabase
-- [ ] Production smoke test (admin + public inventory)
-- [x] Paywall off
-
----
-
-*Built with precision. Designed for performance.*
+- [ ] Upload real car/part photos to Supabase Storage and use those URLs in admin
+- [ ] Load contact info (phone, email, location) from `business_settings` on public site
+- [ ] Wire up vehicle inquiry form in `VehicleModal`
+- [ ] Paywall: show after 30 seconds of browsing
+- [ ] Add real `VITE_GA_TRACKING_ID` in Vercel

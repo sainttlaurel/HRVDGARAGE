@@ -17,7 +17,6 @@ import AnalyticsConsent from './components/AnalyticsConsent'
 import { initializeOfflineSupport } from './lib/offline'
 import { initializeGoogleAnalytics, trackPageView } from './lib/analytics'
 import { updateMetaTags, setCanonicalURL, addOrganizationSchema, addLocalBusinessSchema, DEFAULT_SEO_CONFIG } from './lib/seo'
-import { initializePerformanceMonitoring } from './lib/performanceMonitoring'
 
 // Lazy load heavy components
 const GalleryWall = lazy(() => import('./components/GalleryWall'))
@@ -46,9 +45,6 @@ function App() {
   }, [showPaywall])
 
   useEffect(() => {
-    // Initialize performance monitoring
-    initializePerformanceMonitoring()
-
     // Initialize offline support
     initializeOfflineSupport()
 
