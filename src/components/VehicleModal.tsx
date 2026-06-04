@@ -64,9 +64,9 @@ const VehicleModal = ({ isOpen, onClose, vehicle }: VehicleModalProps) => {
 
               {/* Main Content - 2 Column Layout */}
               <div className="flex-1 overflow-y-auto min-h-0">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 p-2 sm:p-3 h-full">
-                  {/* Left: Image (2 cols on desktop) - Takes 65% */}
-                  <div className="lg:col-span-2 flex flex-col gap-2 min-h-0">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-1.5 p-2 sm:p-3 h-full">
+                  {/* Left: Image (3 cols on desktop) - Takes 60% */}
+                  <div className="lg:col-span-3 flex flex-col gap-1.5 min-h-0">
                     {/* Image Gallery */}
                     <div className="flex-1 min-h-0 overflow-hidden border border-border">
                       <ImageGallery
@@ -78,58 +78,58 @@ const VehicleModal = ({ isOpen, onClose, vehicle }: VehicleModalProps) => {
                     {/* Description - Compact */}
                     <div className="flex-shrink-0">
                       <h3 className="font-serif text-sm font-bold mb-1">Description</h3>
-                      <p className="text-xs text-foreground-muted line-clamp-3 leading-tight">
+                      <p className="text-xs text-foreground-muted line-clamp-2 leading-tight">
                         {vehicle.description}
                       </p>
                     </div>
                   </div>
 
-                  {/* Right: Info (1 col on desktop) - Takes 35% */}
-                  <div className="lg:col-span-1 flex flex-col gap-1.5 min-h-0">
-                    {/* Description Section */}
-                    <div className="text-xs">
-                      <h3 className="font-serif text-sm font-bold mb-1">Specifications</h3>
-                      <div className="grid grid-cols-2 gap-1">
-                        {Object.entries(vehicle.specs).map(([key, value]) => (
+                  {/* Right: Info (2 cols on desktop) - Takes 40% */}
+                  <div className="lg:col-span-2 flex flex-col gap-1 min-h-0 overflow-y-auto">
+                    {/* Specifications Section */}
+                    <div className="text-xs flex-shrink-0">
+                      <h3 className="font-serif text-xs font-bold mb-0.5">Specifications</h3>
+                      <div className="grid grid-cols-2 gap-0.5">
+                        {Object.entries(vehicle.specs).slice(0, 6).map(([key, value]) => (
                           <div key={key} className="text-xs">
-                            <p className="text-foreground-muted text-xs uppercase font-semibold">{key}</p>
-                            <p className="text-white font-bold">{value}</p>
+                            <p className="text-foreground-muted text-xs uppercase font-semibold leading-none">{key}</p>
+                            <p className="text-white font-bold leading-tight">{value}</p>
                           </div>
                         ))}
                       </div>
                     </div>
 
                     {/* Contact Section */}
-                    <div className="text-xs">
-                      <h3 className="font-serif text-sm font-bold mb-1">Interested?</h3>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1.5">
-                          <Phone size={12} className="flex-shrink-0" />
+                    <div className="text-xs flex-shrink-0">
+                      <h3 className="font-serif text-xs font-bold mb-0.5">Interested?</h3>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-1">
+                          <Phone size={11} className="flex-shrink-0" />
                           <a href="tel:+639123456789" className="hover:text-motorsport-red truncate text-xs">
                             +63 912 345 6789
                           </a>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <Mail size={12} className="flex-shrink-0" />
+                        <div className="flex items-center gap-1">
+                          <Mail size={11} className="flex-shrink-0" />
                           <a href="mailto:hrvdcartrading@gmail.com" className="hover:text-motorsport-red truncate text-xs">
                             hrvdcartrading@gmail.com
                           </a>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <Facebook size={12} className="flex-shrink-0" />
+                        <div className="flex items-center gap-1">
+                          <Facebook size={11} className="flex-shrink-0" />
                           <a href="https://www.facebook.com/HRVDCarTrading" target="_blank" rel="noopener noreferrer" className="hover:text-motorsport-red truncate text-xs">
                             HRVDCarTrading
                           </a>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <MapPin size={12} className="flex-shrink-0" />
+                        <div className="flex items-center gap-1">
+                          <MapPin size={11} className="flex-shrink-0" />
                           <span className="text-xs">{vehicle.location}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Buttons - Compact */}
-                    <div className="flex flex-col gap-1 flex-shrink-0 mt-auto">
+                    <div className="flex flex-col gap-0.5 flex-shrink-0 mt-auto">
                       <SocialShareButton
                         title={`${vehicle.brand} ${vehicle.model} - ${vehicle.price}`}
                         description={vehicle.description}
@@ -142,14 +142,14 @@ const VehicleModal = ({ isOpen, onClose, vehicle }: VehicleModalProps) => {
                         href="https://www.facebook.com/HRVDCarTrading"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn-secondary w-full text-center text-xs py-1.5"
+                        className="btn-secondary w-full text-center text-xs py-1"
                       >
                         Message on Facebook
                       </a>
                       <a
                         href="#contact"
                         onClick={onClose}
-                        className="btn-primary w-full text-center text-xs py-1.5"
+                        className="btn-primary w-full text-center text-xs py-1"
                       >
                         Send Inquiry
                       </a>
