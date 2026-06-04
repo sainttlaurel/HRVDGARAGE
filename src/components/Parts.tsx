@@ -27,9 +27,14 @@ const Parts = () => {
   useEffect(() => {
     // Load initial data
     const initializeData = async () => {
-      const data = await partsService.getAll()
-      setParts(data)
-      setLoading(false)
+      try {
+        const data = await partsService.getAll()
+        setParts(data)
+      } catch (error) {
+        console.error('Error loading parts:', error)
+      } finally {
+        setLoading(false)
+      }
     }
 
     initializeData()

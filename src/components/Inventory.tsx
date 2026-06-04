@@ -41,9 +41,14 @@ const Inventory = () => {
   useEffect(() => {
     // Load initial data
     const initializeData = async () => {
-      const data = await vehicleService.getAll()
-      setVehicles(data)
-      setLoading(false)
+      try {
+        const data = await vehicleService.getAll()
+        setVehicles(data)
+      } catch (error) {
+        console.error('Error loading vehicles:', error)
+      } finally {
+        setLoading(false)
+      }
     }
 
     initializeData()
