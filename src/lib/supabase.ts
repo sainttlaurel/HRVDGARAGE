@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import { showSuccess } from './notifications'
+import { showSuccess, showError } from './notifications'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
@@ -286,6 +286,11 @@ export const vehicleService = {
   },
 
   async create(vehicle: Omit<Vehicle, 'id' | 'createdAt' | 'updatedAt'>) {
+    if (!isSupabaseAvailable || !supabase) {
+      showError('Supabase not configured. Vehicle was not saved.')
+      throw new Error('Supabase not available')
+    }
+
     const newVehicle = {
       id: Date.now().toString(),
       ...vehicle,
@@ -293,34 +298,18 @@ export const vehicleService = {
       updatedAt: new Date().toISOString()
     }
 
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('vehicles')
-      const vehicles = saved ? JSON.parse(saved) : []
-      vehicles.push(newVehicle)
-      localStorage.setItem('vehicles', JSON.stringify(vehicles))
-      showSuccess('Vehicle added successfully!')
-      return newVehicle as Vehicle
+    const { data, error } = await supabase
+      .from('vehicles')
+      .insert([newVehicle])
+      .select()
+      .single()
+
+    if (error) {
+      showError('Failed to save vehicle: ' + error.message)
+      throw error
     }
-    
-    try {
-      const { data, error } = await supabase
-        .from('vehicles')
-        .insert([newVehicle])
-        .select()
-        .single()
-      
-      if (error) throw error
-      showSuccess('Vehicle added successfully!')
-      return data as Vehicle
-    } catch (error) {
-      console.warn('Error saving to Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('vehicles')
-      const vehicles = saved ? JSON.parse(saved) : []
-      vehicles.push(newVehicle)
-      localStorage.setItem('vehicles', JSON.stringify(vehicles))
-      showSuccess('Vehicle added successfully!')
-      return newVehicle as Vehicle
-    }
+    showSuccess('Vehicle added successfully!')
+    return data as Vehicle
   },
 
   async update(id: string, updates: Partial<Vehicle>) {
@@ -486,6 +475,11 @@ export const partsService = {
   },
 
   async create(part: Omit<Part, 'id' | 'createdAt' | 'updatedAt'>) {
+    if (!isSupabaseAvailable || !supabase) {
+      showError('Supabase not configured. Part was not saved.')
+      throw new Error('Supabase not available')
+    }
+
     const newPart = {
       id: Date.now().toString(),
       ...part,
@@ -493,34 +487,18 @@ export const partsService = {
       updatedAt: new Date().toISOString()
     }
 
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('parts')
-      const parts = saved ? JSON.parse(saved) : []
-      parts.push(newPart)
-      localStorage.setItem('parts', JSON.stringify(parts))
-      showSuccess('Part added successfully!')
-      return newPart as Part
+    const { data, error } = await supabase
+      .from('parts')
+      .insert([newPart])
+      .select()
+      .single()
+
+    if (error) {
+      showError('Failed to save part: ' + error.message)
+      throw error
     }
-    
-    try {
-      const { data, error } = await supabase
-        .from('parts')
-        .insert([newPart])
-        .select()
-        .single()
-      
-      if (error) throw error
-      showSuccess('Part added successfully!')
-      return data as Part
-    } catch (error) {
-      console.warn('Error saving to Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('parts')
-      const parts = saved ? JSON.parse(saved) : []
-      parts.push(newPart)
-      localStorage.setItem('parts', JSON.stringify(parts))
-      showSuccess('Part added successfully!')
-      return newPart as Part
-    }
+    showSuccess('Part added successfully!')
+    return data as Part
   },
 
   async update(id: string, updates: Partial<Part>) {
