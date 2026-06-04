@@ -9,15 +9,9 @@ let supabase: SupabaseClient<any> | null = null
 let supabaseError: Error | null = null
 let isSupabaseAvailable = false
 
-// Debug logging
-console.log('Supabase URL available:', !!supabaseUrl)
-console.log('Supabase Key available:', !!supabaseKey)
-
 try {
   if (!supabaseUrl || !supabaseKey) {
     console.warn('⚠️ Supabase environment variables not set.')
-    console.warn('VITE_SUPABASE_URL:', supabaseUrl ? 'SET' : 'NOT SET')
-    console.warn('VITE_SUPABASE_PUBLISHABLE_KEY:', supabaseKey ? 'SET' : 'NOT SET')
     supabaseError = new Error('Missing Supabase environment variables')
   } else {
     supabase = createClient(supabaseUrl, supabaseKey)
@@ -32,13 +26,16 @@ try {
 
 export { supabase, supabaseError, isSupabaseAvailable }
 
-/** Supabase-only reads — no localStorage fallback */
+// DB uses lowercase column names: createdat, updatedat
+const now = () => new Date().toISOString()
+
+/** Supabase-only reads */
 async function fetchAllRows<T>(table: string): Promise<T[]> {
   if (!isSupabaseAvailable || !supabase) return []
   const { data, error } = await supabase
     .from(table)
     .select('*')
-    .order('createdAt', { ascending: false })
+    .order('createdat', { ascending: false })
   if (error) throw error
   return (data as T[]) ?? []
 }
@@ -63,7 +60,8 @@ async function fetchSingleRow<T>(table: string): Promise<T | null> {
   return data as T
 }
 
-// Types for database tables
+// ─── Types ───────────────────────────────────────────────────────────────────
+
 export interface Inquiry {
   id: string
   firstName: string
@@ -72,8 +70,8 @@ export interface Inquiry {
   phone: string
   message: string
   status: 'new' | 'read' | 'responded'
-  createdAt: string
-  updatedAt: string
+  createdat: string
+  updatedat: string
 }
 
 export interface Vehicle {
@@ -88,8 +86,8 @@ export interface Vehicle {
   description: string
   specs: Record<string, string>
   available: boolean
-  createdAt: string
-  updatedAt: string
+  createdat: string
+  updatedat: string
 }
 
 export interface BusinessSettings {
@@ -99,8 +97,8 @@ export interface BusinessSettings {
   phone: string
   location: string
   businessHours: string
-  createdAt: string
-  updatedAt: string
+  createdat: string
+  updatedat: string
 }
 
 export interface Part {
@@ -113,8 +111,8 @@ export interface Part {
   condition: string
   description: string
   available: boolean
-  createdAt: string
-  updatedAt: string
+  createdat: string
+  updatedat: string
 }
 
 export interface PartOrder {
@@ -134,8 +132,8 @@ export interface PartOrder {
   facebookProfile?: string
   notes?: string
   status: 'new' | 'contacted' | 'confirmed' | 'completed'
-  createdAt: string
-  updatedAt: string
+  createdat: string
+  updatedat: string
 }
 
 export interface VehicleInquiry {
@@ -152,645 +150,203 @@ export interface VehicleInquiry {
   message: string
   facebookProfile?: string
   status: 'new' | 'contacted' | 'confirmed' | 'completed'
-  createdAt: string
-  updatedAt: string
+  createdat: string
+  updatedat: string
 }
 
-// Inquiry functions
+// ─── Inquiry Service ──────────────────────────────────────────────────────────
+
 export const inquiryService = {
-  async getAll() {
-    return fetchAllRows<Inquiry>('inquiries')
-  },
+  async getAll() { return fetchAllRows<Inquiry>('inquiries') },
+  async getById(id: string) { return fetchRowById<Inquiry>('inquiries', id) },
 
-  async getById(id: string) {
-    return fetchRowById<Inquiry>('inquiries', id)
-  },
-
-  async create(inquiry: Omit<Inquiry, 'id' | 'createdAt' | 'updatedAt'>) {
-    const newInquiry = {
-      id: Date.now().toString(),
-      ...inquiry,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-
+  async create(inquiry: Omit<Inquiry, 'id' | 'createdat' | 'updatedat'>) {
+    const row = { id: Date.now().toString(), ...inquiry, createdat: now(), updatedat: now() }
     if (!isSupabaseAvailable || !supabase) {
-      // Fallback to localStorage
+      // Fallback for public contact form
       const saved = localStorage.getItem('inquiries')
-      const inquiries = saved ? JSON.parse(saved) : []
-      inquiries.push(newInquiry)
-      localStorage.setItem('inquiries', JSON.stringify(inquiries))
+      const list = saved ? JSON.parse(saved) : []
+      list.push(row)
+      localStorage.setItem('inquiries', JSON.stringify(list))
       showSuccess('Inquiry saved successfully!')
-      return newInquiry as Inquiry
+      return row as Inquiry
     }
-    
-    try {
-      const { data, error } = await supabase
-        .from('inquiries')
-        .insert([newInquiry])
-        .select()
-        .single()
-      
-      if (error) throw error
-      showSuccess('Inquiry saved successfully!')
-      return data as Inquiry
-    } catch (error) {
-      console.warn('Error saving to Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('inquiries')
-      const inquiries = saved ? JSON.parse(saved) : []
-      inquiries.push(newInquiry)
-      localStorage.setItem('inquiries', JSON.stringify(inquiries))
-      showSuccess('Inquiry saved successfully!')
-      return newInquiry as Inquiry
-    }
+    const { data, error } = await supabase.from('inquiries').insert([row]).select().single()
+    if (error) { showError('Failed to save inquiry: ' + error.message); throw error }
+    showSuccess('Inquiry saved successfully!')
+    return data as Inquiry
   },
 
   async update(id: string, updates: Partial<Inquiry>) {
-    const updatedData = {
-      ...updates,
-      updatedAt: new Date().toISOString()
-    }
-
-    if (!isSupabaseAvailable || !supabase) {
-      // Fallback to localStorage
-      const saved = localStorage.getItem('inquiries')
-      const inquiries = saved ? JSON.parse(saved) : []
-      const index = inquiries.findIndex((i: Inquiry) => i.id === id)
-      if (index !== -1) {
-        inquiries[index] = { ...inquiries[index], ...updatedData }
-        localStorage.setItem('inquiries', JSON.stringify(inquiries))
-        return inquiries[index]
-      }
-      throw new Error('Inquiry not found')
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('inquiries')
-        .update(updatedData)
-        .eq('id', id)
-        .select()
-        .single()
-      
-      if (error) throw error
-      return data as Inquiry
-    } catch (error) {
-      console.warn('Error updating in Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('inquiries')
-      const inquiries = saved ? JSON.parse(saved) : []
-      const index = inquiries.findIndex((i: Inquiry) => i.id === id)
-      if (index !== -1) {
-        inquiries[index] = { ...inquiries[index], ...updatedData }
-        localStorage.setItem('inquiries', JSON.stringify(inquiries))
-        return inquiries[index]
-      }
-      throw new Error('Inquiry not found')
-    }
+    const payload = { ...updates, updatedat: now() }
+    if (!isSupabaseAvailable || !supabase) throw new Error('Supabase not available')
+    const { data, error } = await supabase.from('inquiries').update(payload).eq('id', id).select().single()
+    if (error) throw error
+    return data as Inquiry
   },
 
   async delete(id: string) {
-    if (!isSupabaseAvailable || !supabase) {
-      // Fallback to localStorage
-      const saved = localStorage.getItem('inquiries')
-      const inquiries = saved ? JSON.parse(saved) : []
-      const filtered = inquiries.filter((i: Inquiry) => i.id !== id)
-      localStorage.setItem('inquiries', JSON.stringify(filtered))
-      return
-    }
-    
-    try {
-      const { error } = await supabase
-        .from('inquiries')
-        .delete()
-        .eq('id', id)
-      
-      if (error) throw error
-    } catch (error) {
-      console.warn('Error deleting from Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('inquiries')
-      const inquiries = saved ? JSON.parse(saved) : []
-      const filtered = inquiries.filter((i: Inquiry) => i.id !== id)
-      localStorage.setItem('inquiries', JSON.stringify(filtered))
-    }
+    if (!isSupabaseAvailable || !supabase) throw new Error('Supabase not available')
+    const { error } = await supabase.from('inquiries').delete().eq('id', id)
+    if (error) throw error
   }
 }
 
-// Vehicle functions
+// ─── Vehicle Service ──────────────────────────────────────────────────────────
+
 export const vehicleService = {
-  async getAll() {
-    return fetchAllRows<Vehicle>('vehicles')
-  },
+  async getAll() { return fetchAllRows<Vehicle>('vehicles') },
+  async getById(id: string) { return fetchRowById<Vehicle>('vehicles', id) },
 
-  async getById(id: string) {
-    return fetchRowById<Vehicle>('vehicles', id)
-  },
-
-  async create(vehicle: Omit<Vehicle, 'id' | 'createdAt' | 'updatedAt'>) {
+  async create(vehicle: Omit<Vehicle, 'id' | 'createdat' | 'updatedat'>) {
     if (!isSupabaseAvailable || !supabase) {
       showError('Supabase not configured. Vehicle was not saved.')
       throw new Error('Supabase not available')
     }
-
-    const newVehicle = {
-      id: Date.now().toString(),
-      ...vehicle,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-
-    const { data, error } = await supabase
-      .from('vehicles')
-      .insert([newVehicle])
-      .select()
-      .single()
-
-    if (error) {
-      showError('Failed to save vehicle: ' + error.message)
-      throw error
-    }
+    const row = { id: Date.now().toString(), ...vehicle, createdat: now(), updatedat: now() }
+    const { data, error } = await supabase.from('vehicles').insert([row]).select().single()
+    if (error) { showError('Failed to save vehicle: ' + error.message); throw error }
     showSuccess('Vehicle added successfully!')
     return data as Vehicle
   },
 
   async update(id: string, updates: Partial<Vehicle>) {
-    const updatedData = {
-      ...updates,
-      updatedAt: new Date().toISOString()
-    }
-
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('vehicles')
-      const vehicles = saved ? JSON.parse(saved) : []
-      const index = vehicles.findIndex((v: Vehicle) => v.id === id)
-      if (index !== -1) {
-        vehicles[index] = { ...vehicles[index], ...updatedData }
-        localStorage.setItem('vehicles', JSON.stringify(vehicles))
-        return vehicles[index]
-      }
-      throw new Error('Vehicle not found')
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('vehicles')
-        .update(updatedData)
-        .eq('id', id)
-        .select()
-        .single()
-      
-      if (error) throw error
-      return data as Vehicle
-    } catch (error) {
-      console.warn('Error updating in Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('vehicles')
-      const vehicles = saved ? JSON.parse(saved) : []
-      const index = vehicles.findIndex((v: Vehicle) => v.id === id)
-      if (index !== -1) {
-        vehicles[index] = { ...vehicles[index], ...updatedData }
-        localStorage.setItem('vehicles', JSON.stringify(vehicles))
-        return vehicles[index]
-      }
-      throw new Error('Vehicle not found')
-    }
+    const payload = { ...updates, updatedat: now() }
+    if (!isSupabaseAvailable || !supabase) throw new Error('Supabase not available')
+    const { data, error } = await supabase.from('vehicles').update(payload).eq('id', id).select().single()
+    if (error) throw error
+    return data as Vehicle
   },
 
   async delete(id: string) {
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('vehicles')
-      const vehicles = saved ? JSON.parse(saved) : []
-      const filtered = vehicles.filter((v: Vehicle) => v.id !== id)
-      localStorage.setItem('vehicles', JSON.stringify(filtered))
-      return
-    }
-    
-    try {
-      const { error } = await supabase
-        .from('vehicles')
-        .delete()
-        .eq('id', id)
-      
-      if (error) throw error
-    } catch (error) {
-      console.warn('Error deleting from Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('vehicles')
-      const vehicles = saved ? JSON.parse(saved) : []
-      const filtered = vehicles.filter((v: Vehicle) => v.id !== id)
-      localStorage.setItem('vehicles', JSON.stringify(filtered))
-    }
+    if (!isSupabaseAvailable || !supabase) throw new Error('Supabase not available')
+    const { error } = await supabase.from('vehicles').delete().eq('id', id)
+    if (error) throw error
   }
 }
 
-// Business Settings functions
+// ─── Settings Service ─────────────────────────────────────────────────────────
+
 export const settingsService = {
-  async get() {
-    return fetchSingleRow<BusinessSettings>('business_settings')
-  },
+  async get() { return fetchSingleRow<BusinessSettings>('business_settings') },
 
   async update(updates: Partial<BusinessSettings>) {
-    const updatedData = {
-      ...updates,
-      updatedAt: new Date().toISOString()
-    }
-
-    if (!isSupabaseAvailable || !supabase) {
-      const existing = localStorage.getItem('business_settings')
-      const data = existing ? JSON.parse(existing) : null
-      
-      if (!data) {
-        const newSettings = {
-          id: Date.now().toString(),
-          ...updates,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-        localStorage.setItem('business_settings', JSON.stringify(newSettings))
-        return newSettings as BusinessSettings
-      }
-
-      const updated = { ...data, ...updatedData }
-      localStorage.setItem('business_settings', JSON.stringify(updated))
-      return updated as BusinessSettings
-    }
-    
-    try {
-      const existing = await this.get()
-      
-      if (!existing) {
-        const newSettings = {
-          id: Date.now().toString(),
-          ...updates,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-        const { data, error } = await supabase
-          .from('business_settings')
-          .insert([newSettings])
-          .select()
-          .single()
-        
-        if (error) throw error
-        return data as BusinessSettings
-      }
-
-      const { data, error } = await supabase
-        .from('business_settings')
-        .update(updatedData)
-        .eq('id', existing.id)
-        .select()
-        .single()
-      
+    if (!isSupabaseAvailable || !supabase) throw new Error('Supabase not available')
+    const payload = { ...updates, updatedat: now() }
+    const existing = await this.get()
+    if (!existing) {
+      const row = { id: Date.now().toString(), ...updates, createdat: now(), updatedat: now() }
+      const { data, error } = await supabase.from('business_settings').insert([row]).select().single()
       if (error) throw error
       return data as BusinessSettings
-    } catch (error) {
-      console.warn('Error updating in Supabase, using localStorage:', error)
-      const existing = localStorage.getItem('business_settings')
-      const data = existing ? JSON.parse(existing) : null
-      
-      if (!data) {
-        const newSettings = {
-          id: Date.now().toString(),
-          ...updates,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-        localStorage.setItem('business_settings', JSON.stringify(newSettings))
-        return newSettings as BusinessSettings
-      }
-
-      const updated = { ...data, ...updatedData }
-      localStorage.setItem('business_settings', JSON.stringify(updated))
-      return updated as BusinessSettings
     }
+    const { data, error } = await supabase.from('business_settings').update(payload).eq('id', existing.id).select().single()
+    if (error) throw error
+    return data as BusinessSettings
   }
 }
 
-// Parts functions
+// ─── Parts Service ────────────────────────────────────────────────────────────
+
 export const partsService = {
-  async getAll() {
-    return fetchAllRows<Part>('parts')
-  },
+  async getAll() { return fetchAllRows<Part>('parts') },
+  async getById(id: string) { return fetchRowById<Part>('parts', id) },
 
-  async getById(id: string) {
-    return fetchRowById<Part>('parts', id)
-  },
-
-  async create(part: Omit<Part, 'id' | 'createdAt' | 'updatedAt'>) {
+  async create(part: Omit<Part, 'id' | 'createdat' | 'updatedat'>) {
     if (!isSupabaseAvailable || !supabase) {
       showError('Supabase not configured. Part was not saved.')
       throw new Error('Supabase not available')
     }
-
-    const newPart = {
-      id: Date.now().toString(),
-      ...part,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-
-    const { data, error } = await supabase
-      .from('parts')
-      .insert([newPart])
-      .select()
-      .single()
-
-    if (error) {
-      showError('Failed to save part: ' + error.message)
-      throw error
-    }
+    const row = { id: Date.now().toString(), ...part, createdat: now(), updatedat: now() }
+    const { data, error } = await supabase.from('parts').insert([row]).select().single()
+    if (error) { showError('Failed to save part: ' + error.message); throw error }
     showSuccess('Part added successfully!')
     return data as Part
   },
 
   async update(id: string, updates: Partial<Part>) {
-    const updatedData = {
-      ...updates,
-      updatedAt: new Date().toISOString()
-    }
-
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('parts')
-      const parts = saved ? JSON.parse(saved) : []
-      const index = parts.findIndex((p: Part) => p.id === id)
-      if (index !== -1) {
-        parts[index] = { ...parts[index], ...updatedData }
-        localStorage.setItem('parts', JSON.stringify(parts))
-        return parts[index]
-      }
-      throw new Error('Part not found')
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('parts')
-        .update(updatedData)
-        .eq('id', id)
-        .select()
-        .single()
-      
-      if (error) throw error
-      return data as Part
-    } catch (error) {
-      console.warn('Error updating in Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('parts')
-      const parts = saved ? JSON.parse(saved) : []
-      const index = parts.findIndex((p: Part) => p.id === id)
-      if (index !== -1) {
-        parts[index] = { ...parts[index], ...updatedData }
-        localStorage.setItem('parts', JSON.stringify(parts))
-        return parts[index]
-      }
-      throw new Error('Part not found')
-    }
+    const payload = { ...updates, updatedat: now() }
+    if (!isSupabaseAvailable || !supabase) throw new Error('Supabase not available')
+    const { data, error } = await supabase.from('parts').update(payload).eq('id', id).select().single()
+    if (error) throw error
+    return data as Part
   },
 
   async delete(id: string) {
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('parts')
-      const parts = saved ? JSON.parse(saved) : []
-      const filtered = parts.filter((p: Part) => p.id !== id)
-      localStorage.setItem('parts', JSON.stringify(filtered))
-      return
-    }
-    
-    try {
-      const { error } = await supabase
-        .from('parts')
-        .delete()
-        .eq('id', id)
-      
-      if (error) throw error
-    } catch (error) {
-      console.warn('Error deleting from Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('parts')
-      const parts = saved ? JSON.parse(saved) : []
-      const filtered = parts.filter((p: Part) => p.id !== id)
-      localStorage.setItem('parts', JSON.stringify(filtered))
-    }
+    if (!isSupabaseAvailable || !supabase) throw new Error('Supabase not available')
+    const { error } = await supabase.from('parts').delete().eq('id', id)
+    if (error) throw error
   }
 }
 
+// ─── Part Orders Service ──────────────────────────────────────────────────────
 
-// Part Orders functions
 export const partOrdersService = {
-  async getAll() {
-    return fetchAllRows<PartOrder>('part_orders')
-  },
+  async getAll() { return fetchAllRows<PartOrder>('part_orders') },
 
-  async create(order: Omit<PartOrder, 'id' | 'createdAt' | 'updatedAt'>) {
-    const newOrder = {
-      id: Date.now().toString(),
-      ...order,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-
+  async create(order: Omit<PartOrder, 'id' | 'createdat' | 'updatedat'>) {
+    const row = { id: Date.now().toString(), ...order, createdat: now(), updatedat: now() }
     if (!isSupabaseAvailable || !supabase) {
       const saved = localStorage.getItem('part_orders')
-      const orders = saved ? JSON.parse(saved) : []
-      orders.push(newOrder)
-      localStorage.setItem('part_orders', JSON.stringify(orders))
+      const list = saved ? JSON.parse(saved) : []
+      list.push(row)
+      localStorage.setItem('part_orders', JSON.stringify(list))
       showSuccess('Order placed successfully!')
-      return newOrder as PartOrder
+      return row as PartOrder
     }
-    
-    try {
-      const { data, error } = await supabase
-        .from('part_orders')
-        .insert([newOrder])
-        .select()
-        .single()
-      
-      if (error) throw error
-      showSuccess('Order placed successfully!')
-      return data as PartOrder
-    } catch (error) {
-      console.warn('Error saving to Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('part_orders')
-      const orders = saved ? JSON.parse(saved) : []
-      orders.push(newOrder)
-      localStorage.setItem('part_orders', JSON.stringify(orders))
-      showSuccess('Order placed successfully!')
-      return newOrder as PartOrder
-    }
+    const { data, error } = await supabase.from('part_orders').insert([row]).select().single()
+    if (error) { showError('Failed to place order: ' + error.message); throw error }
+    showSuccess('Order placed successfully!')
+    return data as PartOrder
   },
 
   async update(id: string, updates: Partial<PartOrder>) {
-    const updatedData = {
-      ...updates,
-      updatedAt: new Date().toISOString()
-    }
-
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('part_orders')
-      const orders = saved ? JSON.parse(saved) : []
-      const index = orders.findIndex((o: PartOrder) => o.id === id)
-      if (index !== -1) {
-        orders[index] = { ...orders[index], ...updatedData }
-        localStorage.setItem('part_orders', JSON.stringify(orders))
-        return orders[index]
-      }
-      throw new Error('Order not found')
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('part_orders')
-        .update(updatedData)
-        .eq('id', id)
-        .select()
-        .single()
-      
-      if (error) throw error
-      return data as PartOrder
-    } catch (error) {
-      console.warn('Error updating in Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('part_orders')
-      const orders = saved ? JSON.parse(saved) : []
-      const index = orders.findIndex((o: PartOrder) => o.id === id)
-      if (index !== -1) {
-        orders[index] = { ...orders[index], ...updatedData }
-        localStorage.setItem('part_orders', JSON.stringify(orders))
-        return orders[index]
-      }
-      throw new Error('Order not found')
-    }
+    const payload = { ...updates, updatedat: now() }
+    if (!isSupabaseAvailable || !supabase) throw new Error('Supabase not available')
+    const { data, error } = await supabase.from('part_orders').update(payload).eq('id', id).select().single()
+    if (error) throw error
+    return data as PartOrder
   },
 
   async delete(id: string) {
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('part_orders')
-      const orders = saved ? JSON.parse(saved) : []
-      const filtered = orders.filter((o: PartOrder) => o.id !== id)
-      localStorage.setItem('part_orders', JSON.stringify(filtered))
-      return
-    }
-    
-    try {
-      const { error } = await supabase
-        .from('part_orders')
-        .delete()
-        .eq('id', id)
-      
-      if (error) throw error
-    } catch (error) {
-      console.warn('Error deleting from Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('part_orders')
-      const orders = saved ? JSON.parse(saved) : []
-      const filtered = orders.filter((o: PartOrder) => o.id !== id)
-      localStorage.setItem('part_orders', JSON.stringify(filtered))
-    }
+    if (!isSupabaseAvailable || !supabase) throw new Error('Supabase not available')
+    const { error } = await supabase.from('part_orders').delete().eq('id', id)
+    if (error) throw error
   }
 }
 
+// ─── Vehicle Inquiry Service ──────────────────────────────────────────────────
 
-// Vehicle Inquiries functions
 export const vehicleInquiryService = {
-  async getAll() {
-    return fetchAllRows<VehicleInquiry>('vehicle_inquiries')
-  },
+  async getAll() { return fetchAllRows<VehicleInquiry>('vehicle_inquiries') },
 
-  async create(inquiry: Omit<VehicleInquiry, 'id' | 'createdAt' | 'updatedAt'>) {
-    const newInquiry = {
-      id: Date.now().toString(),
-      ...inquiry,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-
+  async create(inquiry: Omit<VehicleInquiry, 'id' | 'createdat' | 'updatedat'>) {
+    const row = { id: Date.now().toString(), ...inquiry, createdat: now(), updatedat: now() }
     if (!isSupabaseAvailable || !supabase) {
       const saved = localStorage.getItem('vehicle_inquiries')
-      const inquiries = saved ? JSON.parse(saved) : []
-      inquiries.push(newInquiry)
-      localStorage.setItem('vehicle_inquiries', JSON.stringify(inquiries))
+      const list = saved ? JSON.parse(saved) : []
+      list.push(row)
+      localStorage.setItem('vehicle_inquiries', JSON.stringify(list))
       showSuccess('Inquiry sent successfully!')
-      return newInquiry as VehicleInquiry
+      return row as VehicleInquiry
     }
-    
-    try {
-      const { data, error } = await supabase
-        .from('vehicle_inquiries')
-        .insert([newInquiry])
-        .select()
-        .single()
-      
-      if (error) throw error
-      showSuccess('Inquiry sent successfully!')
-      return data as VehicleInquiry
-    } catch (error) {
-      console.warn('Error saving to Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('vehicle_inquiries')
-      const inquiries = saved ? JSON.parse(saved) : []
-      inquiries.push(newInquiry)
-      localStorage.setItem('vehicle_inquiries', JSON.stringify(inquiries))
-      showSuccess('Inquiry sent successfully!')
-      return newInquiry as VehicleInquiry
-    }
+    const { data, error } = await supabase.from('vehicle_inquiries').insert([row]).select().single()
+    if (error) { showError('Failed to send inquiry: ' + error.message); throw error }
+    showSuccess('Inquiry sent successfully!')
+    return data as VehicleInquiry
   },
 
   async update(id: string, updates: Partial<VehicleInquiry>) {
-    const updatedData = {
-      ...updates,
-      updatedAt: new Date().toISOString()
-    }
-
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('vehicle_inquiries')
-      const inquiries = saved ? JSON.parse(saved) : []
-      const index = inquiries.findIndex((i: VehicleInquiry) => i.id === id)
-      if (index !== -1) {
-        inquiries[index] = { ...inquiries[index], ...updatedData }
-        localStorage.setItem('vehicle_inquiries', JSON.stringify(inquiries))
-        return inquiries[index]
-      }
-      throw new Error('Inquiry not found')
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('vehicle_inquiries')
-        .update(updatedData)
-        .eq('id', id)
-        .select()
-        .single()
-      
-      if (error) throw error
-      return data as VehicleInquiry
-    } catch (error) {
-      console.warn('Error updating in Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('vehicle_inquiries')
-      const inquiries = saved ? JSON.parse(saved) : []
-      const index = inquiries.findIndex((i: VehicleInquiry) => i.id === id)
-      if (index !== -1) {
-        inquiries[index] = { ...inquiries[index], ...updatedData }
-        localStorage.setItem('vehicle_inquiries', JSON.stringify(inquiries))
-        return inquiries[index]
-      }
-      throw new Error('Inquiry not found')
-    }
+    const payload = { ...updates, updatedat: now() }
+    if (!isSupabaseAvailable || !supabase) throw new Error('Supabase not available')
+    const { data, error } = await supabase.from('vehicle_inquiries').update(payload).eq('id', id).select().single()
+    if (error) throw error
+    return data as VehicleInquiry
   },
 
   async delete(id: string) {
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('vehicle_inquiries')
-      const inquiries = saved ? JSON.parse(saved) : []
-      const filtered = inquiries.filter((i: VehicleInquiry) => i.id !== id)
-      localStorage.setItem('vehicle_inquiries', JSON.stringify(filtered))
-      return
-    }
-    
-    try {
-      const { error } = await supabase
-        .from('vehicle_inquiries')
-        .delete()
-        .eq('id', id)
-      
-      if (error) throw error
-    } catch (error) {
-      console.warn('Error deleting from Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('vehicle_inquiries')
-      const inquiries = saved ? JSON.parse(saved) : []
-      const filtered = inquiries.filter((i: VehicleInquiry) => i.id !== id)
-      localStorage.setItem('vehicle_inquiries', JSON.stringify(filtered))
-    }
+    if (!isSupabaseAvailable || !supabase) throw new Error('Supabase not available')
+    const { error } = await supabase.from('vehicle_inquiries').delete().eq('id', id)
+    if (error) throw error
   }
 }
