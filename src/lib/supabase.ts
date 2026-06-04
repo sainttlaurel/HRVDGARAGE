@@ -28,6 +28,7 @@ export { supabase, supabaseError, isSupabaseAvailable }
 
 // DB uses lowercase column names: createdat, updatedat
 const now = () => new Date().toISOString()
+const uuid = () => crypto.randomUUID()
 
 /** Supabase-only reads */
 async function fetchAllRows<T>(table: string): Promise<T[]> {
@@ -161,7 +162,7 @@ export const inquiryService = {
   async getById(id: string) { return fetchRowById<Inquiry>('inquiries', id) },
 
   async create(inquiry: Omit<Inquiry, 'id' | 'createdat' | 'updatedat'>) {
-    const row = { id: Date.now().toString(), ...inquiry, createdat: now(), updatedat: now() }
+    const row = { id: uuid(), ...inquiry, createdat: now(), updatedat: now() }
     if (!isSupabaseAvailable || !supabase) {
       // Fallback for public contact form
       const saved = localStorage.getItem('inquiries')
@@ -203,7 +204,7 @@ export const vehicleService = {
       showError('Supabase not configured. Vehicle was not saved.')
       throw new Error('Supabase not available')
     }
-    const row = { id: Date.now().toString(), ...vehicle, createdat: now(), updatedat: now() }
+    const row = { id: uuid(), ...vehicle, createdat: now(), updatedat: now() }
     const { data, error } = await supabase.from('vehicles').insert([row]).select().single()
     if (error) { showError('Failed to save vehicle: ' + error.message); throw error }
     showSuccess('Vehicle added successfully!')
@@ -235,7 +236,7 @@ export const settingsService = {
     const payload = { ...updates, updatedat: now() }
     const existing = await this.get()
     if (!existing) {
-      const row = { id: Date.now().toString(), ...updates, createdat: now(), updatedat: now() }
+      const row = { id: uuid(), ...updates, createdat: now(), updatedat: now() }
       const { data, error } = await supabase.from('business_settings').insert([row]).select().single()
       if (error) throw error
       return data as BusinessSettings
@@ -257,7 +258,7 @@ export const partsService = {
       showError('Supabase not configured. Part was not saved.')
       throw new Error('Supabase not available')
     }
-    const row = { id: Date.now().toString(), ...part, createdat: now(), updatedat: now() }
+    const row = { id: uuid(), ...part, createdat: now(), updatedat: now() }
     const { data, error } = await supabase.from('parts').insert([row]).select().single()
     if (error) { showError('Failed to save part: ' + error.message); throw error }
     showSuccess('Part added successfully!')
@@ -285,7 +286,7 @@ export const partOrdersService = {
   async getAll() { return fetchAllRows<PartOrder>('part_orders') },
 
   async create(order: Omit<PartOrder, 'id' | 'createdat' | 'updatedat'>) {
-    const row = { id: Date.now().toString(), ...order, createdat: now(), updatedat: now() }
+    const row = { id: uuid(), ...order, createdat: now(), updatedat: now() }
     if (!isSupabaseAvailable || !supabase) {
       const saved = localStorage.getItem('part_orders')
       const list = saved ? JSON.parse(saved) : []
@@ -321,7 +322,7 @@ export const vehicleInquiryService = {
   async getAll() { return fetchAllRows<VehicleInquiry>('vehicle_inquiries') },
 
   async create(inquiry: Omit<VehicleInquiry, 'id' | 'createdat' | 'updatedat'>) {
-    const row = { id: Date.now().toString(), ...inquiry, createdat: now(), updatedat: now() }
+    const row = { id: uuid(), ...inquiry, createdat: now(), updatedat: now() }
     if (!isSupabaseAvailable || !supabase) {
       const saved = localStorage.getItem('vehicle_inquiries')
       const list = saved ? JSON.parse(saved) : []
