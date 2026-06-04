@@ -1,15 +1,37 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Share2, Facebook, Twitter, MessageCircle, Linkedin, Copy, Check } from 'lucide-react'
-import { 
-  shareToFacebook, 
-  shareToTwitter, 
-  shareToWhatsApp, 
-  shareToLinkedIn,
-  nativeShare,
-  copyShareLink,
-  trackSocialShare 
-} from '../lib/socialMedia'
+import { trackEvent } from '../lib/analytics'
+
+interface ShareData { title: string; description: string; url: string }
+
+const shareToFacebook = ({ url }: ShareData) =>
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank')
+
+const shareToTwitter = ({ title, url }: ShareData) =>
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`, '_blank')
+
+const shareToWhatsApp = ({ title, url }: ShareData) =>
+  window.open(`https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`, '_blank')
+
+const shareToLinkedIn = ({ url }: ShareData) =>
+  window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank')
+
+const nativeShare = async (data: ShareData) => {
+  if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+    try { await navigator.share({ title: data.title, text: data.description, url: data.url }); return true }
+    catch { return false }
+  }
+  return false
+}
+
+const copyShareLink = async (url: string) => {
+  try { await navigator.clipboard.writeText(url); return true }
+  catch { return false }
+}
+
+const trackSocialShare = (platform: string, itemType: string, itemId: string, itemName: string) =>
+  trackEvent('social_share', { platform, item_type: itemType, item_id: itemId, item_name: itemName })
 
 interface SocialShareButtonProps {
   title: string
