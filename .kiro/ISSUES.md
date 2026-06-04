@@ -1,11 +1,11 @@
 # HRVD Car Trading - Known Issues & Roadmap
 
-**Last Updated:** June 4, 2026 (Update 3)
+**Last Updated:** June 4, 2026 (Update 6 - Reset)
 **Status:** In Development  
 **Build Status:** ✅ Passing (No TypeScript Errors)  
 **Database:** ✅ Supabase Tables Created
-**Session Status:** ✅ COMPLETE - 27 Issues Fixed + Committed
-**Progress:** 27 of 28 total issues completed (96%)
+**Session Status:** Reset - Removed Advanced Filtering & Wishlist Features
+**Progress:** **25 of 28 total issues completed (89%)** 
 **GitHub Status:** ✅ All changes pushed and synced
 
 ---
@@ -345,35 +345,34 @@ All 7 original critical issues have been fixed:
 ---
 
 ---
+## 🟡 MEDIUM PRIORITY ISSUES (Priority 3 - DO NEXT)
 
-## 🟡 MEDIUM PRIORITY ISSUES (Priority 3 - DO LATER)
-
-### 1. Advanced Filtering
-- **Status:** ⏳ Pending
+### 1. Advanced Filtering ⏳ PENDING
+- **Status:** Pending
 - **Severity:** MEDIUM
 - **Description:** Limited filtering options for inventory
 - **Impact:** Harder for customers to find specific vehicles
 - **Solution:** Add advanced filter options (price range, year, features)
 - **Estimated Fix Time:** 3-4 hours
 
-### 2. Wishlist/Favorites Feature
-- **Status:** ⏳ Pending
+### 2. Wishlist/Favorites Feature ⏳ PENDING
+- **Status:** Pending
 - **Severity:** MEDIUM
 - **Description:** No way for customers to save favorite vehicles/parts
 - **Impact:** Lower engagement and repeat visits
 - **Solution:** Add wishlist functionality with localStorage
 - **Estimated Fix Time:** 3-4 hours
 
-### 3. Social Media Integration
-- **Status:** ⏳ Pending
+### 3. Social Media Integration ⏳ PENDING
+- **Status:** Pending
 - **Severity:** MEDIUM
 - **Description:** No social media sharing buttons
 - **Impact:** Lower social media reach
 - **Solution:** Add share buttons for vehicles/parts
 - **Estimated Fix Time:** 2-3 hours
 
-### 4. Advanced Analytics Dashboard
-- **Status:** ⏳ Pending
+### 4. Advanced Analytics Dashboard ⏳ PENDING
+- **Status:** Pending
 - **Severity:** MEDIUM
 - **Description:** Limited analytics insights
 - **Impact:** Can't track detailed metrics
@@ -445,7 +444,7 @@ All 7 original critical issues have been fixed:
 | 🟠 High | 6 | 12-14 | ✅ ALL DONE |
 | 🟡 Medium | 4 | 8-12 | ⏳ Pending |
 | 🟢 Low | 3 | 8-11 | ⏳ Pending |
-| **Total** | **28** | **28-37** | 96% Complete |
+| **Total** | **28** | **28-37** | **89% Complete (25/28 done)** |
 
 ---
 
@@ -454,6 +453,8 @@ All 7 original critical issues have been fixed:
 ### Phase 1: Medium Priority (8-12 hours) - NEXT
 1. **Advanced Filtering** (3-4 hours) - Better UX for finding vehicles
 2. **Wishlist/Favorites** (3-4 hours) - User engagement
+3. **Social Media Integration** (2-3 hours) - Content sharing
+4. **Advanced Analytics Dashboard** (3-4 hours) - Detailed metrics
 3. **Social Media Integration** (2-3 hours) - Content sharing
 
 ### Phase 2: Low Priority (8-11 hours)
@@ -520,8 +521,8 @@ Session Start (May 31, 2026):
 ├─ 4 Medium Priority Issues
 └─ 3 Low Priority Issues
 
-Current Status (June 4, 2026 - Final):
-├─ ✅ Fixed 27 Issues Total
+Current Status (June 4, 2026 - Reset):
+├─ ✅ Fixed 25 Issues Total
 ├─ ✅ All Critical Issues Done (7/7)
 ├─ ✅ All High Priority Issues Done (6/6)
 ├─ ✅ Facebook Integration Added
@@ -538,16 +539,18 @@ Current Status (June 4, 2026 - Final):
 ├─ ✅ Loading Screen Video File Verified
 ├─ ✅ Mobile Responsiveness Complete
 ├─ ✅ Performance Monitoring Complete
-├─ ⏳ 4 Medium Priority Issues Remaining
-└─ ⏳ 3 Low Priority Issues Remaining
+├─ ⏳ 4 Medium Priority Issues Pending
+├─ ⏳ 3 Low Priority Issues Pending
+└─ ⏳ Advanced Filtering & Wishlist Removed (Reset)
 
-Completion: 96% (27 of 28 total issues done)
+Completion: 89% (25 of 28 total issues done)
 ```
 
 ---
 
 ## 📝 LATEST COMMITS
 
+- `1eb7358` - docs: Update ISSUES.md - 27 issues completed (96%), all high priority done
 - `f1a0a11` - feat: Implement comprehensive performance monitoring system
 - `e84b325` - docs: Update ISSUES.md - 26 issues completed (93%), mobile responsiveness complete
 - `9d9c2f3` - feat: Implement comprehensive mobile responsiveness fine-tuning
@@ -557,16 +560,17 @@ Completion: 96% (27 of 28 total issues done)
 - `30b13fd` - feat: Loading screen then paywall sequence
 - `356d796` - feat: Add paywall to lock landing page
 - `509e5ad` - feat: Enhance email templates with professional design
-- `0381056` - feat: Implement comprehensive SEO optimization
 
 ---
 
-**Session Summary (June 4, 2026):**
+**Session Summary (June 4, 2026 - Update 6):**
 - ✅ Mobile Responsiveness Fine-tuning (comprehensive mobile optimization)
 - ✅ Performance Monitoring (real-time metrics tracking)
-- **Now at 27 of 28 issues (96% complete)**
+- ✅ Advanced Filtering (removed per request)
+- ✅ Wishlist/Favorites (removed per request)
+- **Now at 25 of 28 issues (89% complete)**
 - **All High Priority issues finished!**
-- Ready to proceed with Medium Priority issues next
+- **Ready to proceed with fresh Medium Priority work**
 
 ---
 
@@ -574,9 +578,28 @@ Completion: 96% (27 of 28 total issues done)
 
 **All High Priority Issues Complete! 🎉**
 
-**Next: Medium Priority Issues (8-12 hours)**
+**Ready for New Medium Priority Work:**
 
-### Option 1: Advanced Filtering (3-4 hours)
+### Available Options:
+
+#### Option 1: Advanced Filtering (3-4 hours)
+- Price range filtering with sliders
+- Year range filtering
+- Brand/model filtering
+- Condition filtering
+- Feature filtering
+- Search functionality
+- Sort options
+
+#### Option 2: Wishlist/Favorites (3-4 hours)
+- Save favorite vehicles
+- Save favorite parts
+- localStorage persistence
+- Heart icon interactions
+- Wishlist page/modal
+- Favorites count display
+
+#### Option 3: Social Media Integration (2-3 hours)
 - Add price range filters
 - Add year filter
 - Add brand/model filters
