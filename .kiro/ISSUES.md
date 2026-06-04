@@ -363,22 +363,44 @@ All 7 original critical issues have been fixed:
 - **Solution:** Add wishlist functionality with localStorage
 - **Estimated Fix Time:** 3-4 hours
 
-### 3. VehicleModal Layout Optimization ✅ DONE
+### 3. VehicleModal Layout Optimization ✅ DONE → Premium Luxury Redesign ✅ DONE
 - **Status:** Implemented and working
 - **Severity:** MEDIUM
-- **Description:** Optimized VehicleModal to original design with improved spacing to eliminate scrolling
-- **Features:**
-  - Original layout design as per user screenshot
-  - 3-column grid (2 cols image 65%, 1 col info 35%)
-  - Minimal gaps and spacing (1.5px-2px)
-  - Compact typography to fit all content without scrolling
-  - Optimized image gallery display
-  - Compact specifications grid
-  - Streamlined contact section
-  - Integrated social share buttons
-- **Files:** `src/components/VehicleModal.tsx`
-- **Impact:** Users can now see full vehicle details without scrolling within the modal
-- **Commit:** `6ecebc1`
+- **Description:** Completely redesigned VehicleModal with premium luxury automotive marketplace aesthetic
+- **Previous Issues Addressed:**
+  - ❌ Image taking 70% of screen → ✅ Now full-width gallery with thumbnails
+  - ❌ Tiny specs hard to scan → ✅ Large spec cards (2 cols mobile, 4 cols desktop)
+  - ❌ Weak pricing focus → ✅ Price now largest visual element (5xl, red color)
+  - ❌ Empty black space → ✅ Content-rich layout with highlights and descriptions
+  - ❌ Weak CTA hierarchy → ✅ Prominent Contact Seller & Send Inquiry buttons
+  - ❌ Description buried → ✅ Elevated with editorial presentation
+- **New Features:**
+  - Hero section: Vehicle name, large red price, year/location, availability badge
+  - Full-width image gallery (aspect-video) with thumbnail navigation
+  - Prominent CTA section (Contact Seller, Send Inquiry) in red and white
+  - Quick action buttons (Phone, Messenger, Email)
+  - Specification cards grid (large 16px text, icons, labels)
+  - Vehicle Highlights section with checkmark indicators
+  - Editorial description section (18px text)
+  - Seller Information card with all contact details
+  - Pure black (#000) background with white typography
+  - Minimal red accent (#D4001A) for CTAs
+  - Luxury dealership aesthetic (Bring a Trailer, Mercedes-Benz Certified inspired)
+  - Custom scrollbar styling
+  - Responsive design (mobile-first, 90vh max height)
+  - Smooth animations and transitions
+- **Design Inspiration:** 
+  - Bring a Trailer
+  - Mercedes-Benz Certified
+  - Porsche Approved
+  - Modern luxury dealership websites
+- **Files:** `src/components/VehicleModal.tsx`, `src/index.css`
+- **Impact:** 
+  - Professional luxury dealership experience
+  - Improved information hierarchy and readability
+  - Expected improvement in inquiry conversion rates
+  - Premium brand positioning
+- **Commit:** `da0900e`
 
 ### 4. Social Media Integration ✅ DONE
 - **Status:** Implemented and working
