@@ -5,6 +5,7 @@ import { partOrdersService, Part } from '../lib/supabase'
 import { validatePartOrderForm, ValidationError, getFieldError } from '../lib/validation'
 import { sendNewPartOrderNotification } from '../lib/emailService'
 import { trackPartPurchase } from '../lib/analytics'
+import SocialShareButton from './SocialShareButton'
 
 interface PartsPurchaseModalProps {
   isOpen: boolean
@@ -373,17 +374,27 @@ const PartsPurchaseModal = ({ isOpen, onClose, part }: PartsPurchaseModalProps) 
               />
             </div>
 
-            {/* Submit Button */}
-            <motion.button
-              type="submit"
-              disabled={loading}
-              className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-50"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Send size={18} />
-              {loading ? 'Submitting...' : 'Submit Order'}
-            </motion.button>
+            {/* Share & Submit Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <SocialShareButton
+                title={`${part.brand} ${part.name} - ${part.price}`}
+                description={`Check out this amazing part: ${part.brand} ${part.name} for only ${part.price}`}
+                url={window.location.href}
+                itemType="part"
+                itemId={part.id}
+                itemName={`${part.brand} ${part.name}`}
+              />
+              <motion.button
+                type="submit"
+                disabled={loading}
+                className="flex-1 btn-primary flex items-center justify-center gap-2 disabled:opacity-50"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Send size={18} />
+                {loading ? 'Submitting...' : 'Submit Order'}
+              </motion.button>
+            </div>
           </form>
 
           <p className="text-xs text-foreground-faint text-center">

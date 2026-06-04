@@ -1,11 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Phone, Mail, MapPin, DollarSign, Facebook } from 'lucide-react'
 import ImageGallery from './ImageGallery'
+import SocialShareButton from './SocialShareButton'
 
 interface VehicleModalProps {
   isOpen: boolean
   onClose: () => void
   vehicle: {
+    id?: string
     image: string
     images: string[]
     brand: string
@@ -165,6 +167,14 @@ const VehicleModal = ({ isOpen, onClose, vehicle }: VehicleModalProps) => {
 
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                      <SocialShareButton
+                        title={`${vehicle.brand} ${vehicle.model} - ${vehicle.price}`}
+                        description={vehicle.description}
+                        url={window.location.href}
+                        itemType="vehicle"
+                        itemId={vehicle.id || ''}
+                        itemName={`${vehicle.brand} ${vehicle.model}`}
+                      />
                       <a
                         href="https://www.facebook.com/HRVDCarTrading"
                         target="_blank"
