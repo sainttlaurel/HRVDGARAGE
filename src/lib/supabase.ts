@@ -1,10 +1,11 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { showSuccess } from './notifications'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
-let supabase: any = null
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let supabase: SupabaseClient<any> | null = null
 let supabaseError: Error | null = null
 let isSupabaseAvailable = false
 

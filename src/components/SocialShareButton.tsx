@@ -6,7 +6,7 @@ import {
   shareToTwitter, 
   shareToWhatsApp, 
   shareToLinkedIn,
-  useNativeShare,
+  nativeShare,
   copyShareLink,
   trackSocialShare 
 } from '../lib/socialMedia'
@@ -49,7 +49,7 @@ const SocialShareButton = ({
   }
 
   const handleNativeShare = async () => {
-    const shared = await useNativeShare(shareData)
+    const shared = await nativeShare(shareData)
     if (shared) {
       trackSocialShare('native', itemType, itemId, itemName)
       setIsOpen(false)

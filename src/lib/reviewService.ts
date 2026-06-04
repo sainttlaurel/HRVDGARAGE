@@ -34,6 +34,7 @@ export interface ReviewStats {
  * Get reviews for an item
  */
 export const getReviews = async (itemId: string, itemType: 'vehicle' | 'part'): Promise<Review[]> => {
+  if (!supabase) return []
   try {
     const { data, error } = await supabase
       .from('reviews')
@@ -44,7 +45,7 @@ export const getReviews = async (itemId: string, itemType: 'vehicle' | 'part'): 
       .order('createdAt', { ascending: false })
 
     if (error) throw error
-    return data || []
+    return (data as Review[]) || []
   } catch (err) {
     console.error('Error fetching reviews:', err)
     return []
@@ -55,6 +56,14 @@ export const getReviews = async (itemId: string, itemType: 'vehicle' | 'part'): 
  * Get review stats for an item
  */
 export const getReviewStats = async (itemId: string, itemType: 'vehicle' | 'part'): Promise<ReviewStats> => {
+  const empty: ReviewStats = {
+    averageRating: 0,
+    totalReviews: 0,
+    ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+  }
+
+  if (!supabase) return empty
+
   try {
     const { data, error } = await supabase
       .from('reviews')
@@ -65,22 +74,16 @@ export const getReviewStats = async (itemId: string, itemType: 'vehicle' | 'part
 
     if (error) throw error
 
-    const reviews = data || []
-    if (reviews.length === 0) {
-      return {
-        averageRating: 0,
-        totalReviews: 0,
-        ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
-      }
-    }
+    const reviews = (data as Array<{ rating: number }>) || []
+    if (reviews.length === 0) return empty
 
-    const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+    const ratingDistribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
     let totalRating = 0
 
-    reviews.forEach((review: any) => {
+    reviews.forEach((review) => {
       const rating = Math.round(review.rating)
       if (rating >= 1 && rating <= 5) {
-        ratingDistribution[rating as keyof typeof ratingDistribution]++
+        ratingDistribution[rating] = (ratingDistribution[rating] || 0) + 1
         totalRating += review.rating
       }
     })
@@ -92,34 +95,33 @@ export const getReviewStats = async (itemId: string, itemType: 'vehicle' | 'part
     }
   } catch (err) {
     console.error('Error fetching review stats:', err)
-    return {
-      averageRating: 0,
-      totalReviews: 0,
-      ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
-    }
+    return empty
   }
 }
 
 /**
  * Create a new review
  */
-export const createReview = async (review: Omit<Review, 'id' | 'createdAt' | 'updatedAt' | 'helpful' | 'unhelpful'>): Promise<Review | null> => {
+export const createReview = async (
+  review: Omit<Review, 'id' | 'createdAt' | 'updatedAt' | 'helpful' | 'unhelpful'>
+): Promise<Review | null> => {
+  if (!supabase) return null
   try {
+    const newReview = {
+      ...review,
+      helpful: 0,
+      unhelpful: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+
     const { data, error } = await supabase
       .from('reviews')
-      .insert([
-        {
-          ...review,
-          helpful: 0,
-          unhelpful: 0,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ])
+      .insert([newReview])
       .select()
 
     if (error) throw error
-    return data?.[0] || null
+    return ((data as Review[]) ?? [])[0] || null
   } catch (err) {
     console.error('Error creating review:', err)
     return null
@@ -127,13 +129,24 @@ export const createReview = async (review: Omit<Review, 'id' | 'createdAt' | 'up
 }
 
 /**
- * Update review helpful count
+ * Update review helpful count (increment via raw update)
  */
 export const markReviewHelpful = async (reviewId: string): Promise<boolean> => {
+  if (!supabase) return false
   try {
+    // Fetch current value, then increment
+    const { data: existing, error: fetchError } = await supabase
+      .from('reviews')
+      .select('helpful')
+      .eq('id', reviewId)
+      .single()
+
+    if (fetchError) throw fetchError
+
+    const current = (existing as { helpful: number }).helpful ?? 0
     const { error } = await supabase
       .from('reviews')
-      .update({ helpful: supabase.rpc('increment_helpful', { review_id: reviewId }) })
+      .update({ helpful: current + 1 })
       .eq('id', reviewId)
 
     if (error) throw error
@@ -145,13 +158,23 @@ export const markReviewHelpful = async (reviewId: string): Promise<boolean> => {
 }
 
 /**
- * Update review unhelpful count
+ * Update review unhelpful count (increment via raw update)
  */
 export const markReviewUnhelpful = async (reviewId: string): Promise<boolean> => {
+  if (!supabase) return false
   try {
+    const { data: existing, error: fetchError } = await supabase
+      .from('reviews')
+      .select('unhelpful')
+      .eq('id', reviewId)
+      .single()
+
+    if (fetchError) throw fetchError
+
+    const current = (existing as { unhelpful: number }).unhelpful ?? 0
     const { error } = await supabase
       .from('reviews')
-      .update({ unhelpful: supabase.rpc('increment_unhelpful', { review_id: reviewId }) })
+      .update({ unhelpful: current + 1 })
       .eq('id', reviewId)
 
     if (error) throw error
@@ -166,6 +189,7 @@ export const markReviewUnhelpful = async (reviewId: string): Promise<boolean> =>
  * Get pending reviews (admin)
  */
 export const getPendingReviews = async (): Promise<Review[]> => {
+  if (!supabase) return []
   try {
     const { data, error } = await supabase
       .from('reviews')
@@ -174,7 +198,7 @@ export const getPendingReviews = async (): Promise<Review[]> => {
       .order('createdAt', { ascending: true })
 
     if (error) throw error
-    return data || []
+    return (data as Review[]) || []
   } catch (err) {
     console.error('Error fetching pending reviews:', err)
     return []
@@ -185,6 +209,7 @@ export const getPendingReviews = async (): Promise<Review[]> => {
  * Approve review (admin)
  */
 export const approveReview = async (reviewId: string): Promise<boolean> => {
+  if (!supabase) return false
   try {
     const { error } = await supabase
       .from('reviews')
@@ -203,6 +228,7 @@ export const approveReview = async (reviewId: string): Promise<boolean> => {
  * Reject review (admin)
  */
 export const rejectReview = async (reviewId: string): Promise<boolean> => {
+  if (!supabase) return false
   try {
     const { error } = await supabase
       .from('reviews')
@@ -221,6 +247,7 @@ export const rejectReview = async (reviewId: string): Promise<boolean> => {
  * Delete review (admin)
  */
 export const deleteReview = async (reviewId: string): Promise<boolean> => {
+  if (!supabase) return false
   try {
     const { error } = await supabase
       .from('reviews')

@@ -3,10 +3,12 @@
  * Handles CSV export and import for data backup
  */
 
+import { Vehicle, Part, Inquiry, PartOrder } from './supabase'
+
 /**
  * Export data to CSV
  */
-export const exportToCSV = (data: any[], filename: string) => {
+export const exportToCSV = (data: Record<string, unknown>[], filename: string) => {
   if (!data || data.length === 0) {
     console.warn('No data to export')
     return
@@ -49,7 +51,7 @@ export const exportToCSV = (data: any[], filename: string) => {
 /**
  * Import CSV file
  */
-export const importFromCSV = (file: File): Promise<any[]> => {
+export const importFromCSV = (file: File): Promise<Record<string, unknown>[]> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
 
@@ -69,7 +71,7 @@ export const importFromCSV = (file: File): Promise<any[]> => {
         // Parse data rows
         const data = lines.slice(1).map((line) => {
           const values = parseCSVLine(line)
-          const row: any = {}
+          const row: Record<string, unknown> = {}
 
           headers.forEach((header, index) => {
             row[header] = values[index] || ''
@@ -131,7 +133,7 @@ const parseCSVLine = (line: string): string[] => {
 /**
  * Export vehicles to CSV
  */
-export const exportVehicles = (vehicles: any[]) => {
+export const exportVehicles = (vehicles: Vehicle[]) => {
   const data = vehicles.map((v) => ({
     id: v.id,
     brand: v.brand,
@@ -140,7 +142,7 @@ export const exportVehicles = (vehicles: any[]) => {
     price: v.price,
     location: v.location,
     description: v.description,
-    status: v.status,
+    available: v.available,
     createdAt: v.createdAt
   }))
 
@@ -150,7 +152,7 @@ export const exportVehicles = (vehicles: any[]) => {
 /**
  * Export parts to CSV
  */
-export const exportParts = (parts: any[]) => {
+export const exportParts = (parts: Part[]) => {
   const data = parts.map((p) => ({
     id: p.id,
     name: p.name,
@@ -159,7 +161,7 @@ export const exportParts = (parts: any[]) => {
     price: p.price,
     condition: p.condition,
     description: p.description,
-    status: p.status,
+    available: p.available,
     createdAt: p.createdAt
   }))
 
@@ -169,7 +171,7 @@ export const exportParts = (parts: any[]) => {
 /**
  * Export inquiries to CSV
  */
-export const exportInquiries = (inquiries: any[]) => {
+export const exportInquiries = (inquiries: Inquiry[]) => {
   const data = inquiries.map((i) => ({
     id: i.id,
     firstName: i.firstName,
@@ -187,7 +189,7 @@ export const exportInquiries = (inquiries: any[]) => {
 /**
  * Export part orders to CSV
  */
-export const exportPartOrders = (orders: any[]) => {
+export const exportPartOrders = (orders: PartOrder[]) => {
   const data = orders.map((o) => ({
     id: o.id,
     partId: o.partId,
@@ -205,7 +207,7 @@ export const exportPartOrders = (orders: any[]) => {
 /**
  * Create backup of all data
  */
-export const createFullBackup = (allData: { vehicles: any[]; parts: any[]; inquiries: any[]; orders: any[] }) => {
+export const createFullBackup = (allData: { vehicles: Vehicle[]; parts: Part[]; inquiries: Inquiry[]; orders: PartOrder[] }) => {
   const backupData = {
     timestamp: new Date().toISOString(),
     vehicles: allData.vehicles,
@@ -231,7 +233,7 @@ export const createFullBackup = (allData: { vehicles: any[]; parts: any[]; inqui
 /**
  * Restore from JSON backup
  */
-export const restoreFromBackup = (file: File): Promise<any> => {
+export const restoreFromBackup = (file: File): Promise<Record<string, unknown>> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
 
@@ -256,7 +258,7 @@ export const restoreFromBackup = (file: File): Promise<any> => {
 /**
  * Validate imported data
  */
-export const validateImportedData = (data: any[], expectedFields: string[]): boolean => {
+export const validateImportedData = (data: Record<string, unknown>[], expectedFields: string[]): boolean => {
   if (!Array.isArray(data) || data.length === 0) {
     return false
   }

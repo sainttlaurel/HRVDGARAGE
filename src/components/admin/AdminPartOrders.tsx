@@ -94,8 +94,8 @@ const AdminPartOrders = () => {
 
   // Sort
   processedOrders = [...processedOrders].sort((a, b) => {
-    let compareA: any
-    let compareB: any
+    let compareA: string | number
+    let compareB: string | number
 
     switch (sortBy) {
       case 'name':
@@ -174,7 +174,7 @@ const AdminPartOrders = () => {
         <div className={isMobile ? 'space-y-2' : 'flex gap-2'}>
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as 'date' | 'name')}
             className="flex-1 bg-background border border-border px-3 py-2 text-sm rounded-sm focus:outline-none focus:border-foreground"
           >
             <option value="date">Sort by Date</option>
@@ -182,7 +182,7 @@ const AdminPartOrders = () => {
           </select>
           <select
             value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value as any)}
+            onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
             className="flex-1 bg-background border border-border px-3 py-2 text-sm rounded-sm focus:outline-none focus:border-foreground"
           >
             <option value="desc">Newest First</option>

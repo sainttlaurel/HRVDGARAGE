@@ -65,7 +65,7 @@ export const shareToLinkedIn = (data: ShareData): void => {
 /**
  * Native Web Share API (for mobile)
  */
-export const useNativeShare = async (data: ShareData): Promise<boolean> => {
+export const nativeShare = async (data: ShareData): Promise<boolean> => {
   if (!navigator.share) {
     return false
   }

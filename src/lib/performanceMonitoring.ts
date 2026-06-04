@@ -6,6 +6,13 @@
 import { trackEvent } from './analytics'
 
 // Types
+interface PerformanceEntryWithTiming extends PerformanceEntry {
+  renderTime?: number
+  loadTime?: number
+  processingStart?: number
+  hadRecentInput?: boolean
+  value?: number
+}
 export interface PerformanceMetrics {
   pageLoadTime: number
   ttfb: number // Time to First Byte
@@ -75,8 +82,8 @@ export const observeLCP = (callback: (lcp: number) => void): (() => void) => {
   try {
     const observer = new PerformanceObserver((list) => {
       const entries = list.getEntries()
-      const lastEntry = entries[entries.length - 1] as any
-      callback(Math.round(lastEntry.renderTime || lastEntry.loadTime))
+      const lastEntry = entries[entries.length - 1] as PerformanceEntryWithTiming
+      callback(Math.round(lastEntry.renderTime ?? lastEntry.loadTime ?? 0))
     })
 
     observer.observe({ entryTypes: ['largest-contentful-paint'], buffered: true })
@@ -98,8 +105,8 @@ export const observeFID = (callback: (fid: number) => void): (() => void) => {
   try {
     const observer = new PerformanceObserver((list) => {
       const entries = list.getEntries()
-      entries.forEach((entry: any) => {
-        callback(Math.round(entry.processingStart - entry.startTime))
+      entries.forEach((entry: PerformanceEntryWithTiming) => {
+        callback(Math.round((entry.processingStart || 0) - (entry.startTime || 0)))
       })
     })
 
@@ -122,9 +129,9 @@ export const observeCLS = (callback: (cls: number) => void): (() => void) => {
   try {
     let clsValue = 0
     const observer = new PerformanceObserver((list) => {
-      list.getEntries().forEach((entry: any) => {
-        if (!entry.hadRecentInput) {
-          clsValue += entry.value
+      list.getEntries().forEach((entry: PerformanceEntryWithTiming) => {
+        if (!(entry.hadRecentInput ?? false)) {
+          clsValue += entry.value ?? 0
           callback(parseFloat(clsValue.toFixed(3)))
         }
       })
@@ -207,7 +214,7 @@ export const getMemoryUsage = (): { jsHeapSizeLimit: number; totalJSHeapSize: nu
     return null
   }
 
-  const memory = (performance as any).memory
+  const memory = (performance as unknown as { memory: { jsHeapSizeLimit: number; totalJSHeapSize: number; usedJSHeapSize: number } }).memory
   return {
     jsHeapSizeLimit: Math.round(memory.jsHeapSizeLimit / 1048576), // Convert to MB
     totalJSHeapSize: Math.round(memory.totalJSHeapSize / 1048576),
@@ -239,14 +246,14 @@ export const getResourceTiming = (resourceName: string) => {
   const entries = performance.getEntriesByName(resourceName)
   if (entries.length === 0) return null
 
-  const entry = entries[0]
+  const entry = entries[0] as PerformanceResourceTiming
   return {
     name: entry.name,
     duration: Math.round(entry.duration),
-    transferSize: (entry as any).transferSize || 0,
-    decodedBodySize: (entry as any).decodedBodySize || 0,
-    encodedBodySize: (entry as any).encodedBodySize || 0,
-    serverTiming: (entry as any).serverTiming || []
+    transferSize: entry.transferSize || 0,
+    decodedBodySize: entry.decodedBodySize || 0,
+    encodedBodySize: entry.encodedBodySize || 0,
+    serverTiming: entry.serverTiming || []
   }
 }
 
@@ -258,9 +265,9 @@ export const getAllResourceTimings = () => {
 
   return performance
     .getEntriesByType('resource')
-    .filter((entry: PerformanceEntry) => entry.duration > 100) // Only resources taking > 100ms
-    .map((entry: any) => ({
-      name: entry.name.split('/').pop(),
+    .filter((entry: PerformanceEntry): entry is PerformanceResourceTiming => entry.duration > 100) // Only resources taking > 100ms
+    .map((entry: PerformanceResourceTiming) => ({
+      name: entry.name.split('/').pop() || entry.name,
       duration: Math.round(entry.duration),
       transferSize: entry.transferSize || 0,
       decodedBodySize: entry.decodedBodySize || 0
@@ -276,12 +283,13 @@ export const trackSlowResources = (thresholdMs: number = 2000) => {
   if (typeof window === 'undefined') return
 
   const observer = new PerformanceObserver((list) => {
-    list.getEntries().forEach((entry: any) => {
+    list.getEntries().forEach((entry: PerformanceEntry) => {
       if (entry.duration > thresholdMs) {
+        const resourceEntry = entry as PerformanceResourceTiming
         trackEvent('slow_resource', {
-          resource_name: entry.name.split('/').pop(),
-          duration_ms: Math.round(entry.duration),
-          size_kb: Math.round(entry.transferSize / 1024),
+          resource_name: resourceEntry.name.split('/').pop() || resourceEntry.name,
+          duration_ms: Math.round(resourceEntry.duration),
+          size_kb: Math.round((resourceEntry.transferSize || 0) / 1024),
           threshold_ms: thresholdMs
         })
       }

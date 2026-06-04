@@ -139,7 +139,7 @@ const Inventory = () => {
     // Load initial data
     const initializeData = async () => {
       const data = await loadInitialData('vehicles')
-      setVehicles(data.length > 0 ? data : defaultVehicles)
+      setVehicles((data.length > 0 ? data : defaultVehicles) as Vehicle[])
       setLoading(false)
     }
 
@@ -147,7 +147,7 @@ const Inventory = () => {
 
     // Subscribe to real-time changes
     const subscription = subscribeToTable('vehicles', (updatedVehicles) => {
-      setVehicles(updatedVehicles.length > 0 ? updatedVehicles : defaultVehicles)
+      setVehicles((updatedVehicles.length > 0 ? updatedVehicles : defaultVehicles) as Vehicle[])
     })
 
     // Cleanup subscription on unmount

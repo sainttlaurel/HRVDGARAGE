@@ -14,7 +14,7 @@ interface PartsPurchaseModalProps {
 }
 
 const PartsPurchaseModal = ({ isOpen, onClose, part }: PartsPurchaseModalProps) => {
-  if (!part) return null
+  // Declare all hooks at component top level BEFORE any early returns
   const [formData, setFormData] = useState({
     quantity: 1,
     customerName: '',
@@ -30,6 +30,9 @@ const PartsPurchaseModal = ({ isOpen, onClose, part }: PartsPurchaseModalProps) 
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [errors, setErrors] = useState<ValidationError[]>([])
+
+  // Now early return is allowed - hooks already declared
+  if (!part) return null
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -119,8 +122,6 @@ const PartsPurchaseModal = ({ isOpen, onClose, part }: PartsPurchaseModalProps) 
       setLoading(false)
     }
   }
-
-  if (!isOpen) return null
 
   return (
     <AnimatePresence>

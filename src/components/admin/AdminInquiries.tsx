@@ -32,7 +32,7 @@ const AdminInquiries = () => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'inquiries' && e.newValue) {
         try {
-          const updatedInquiries = JSON.parse(e.newValue)
+          const updatedInquiries = JSON.parse(e.newValue) as Inquiry[]
           setInquiries(updatedInquiries)
           console.log('✅ Inquiries updated from changes')
         } catch (error) {
@@ -258,7 +258,7 @@ const AdminInquiries = () => {
           <div className={isMobile ? 'space-y-2' : 'flex gap-2'}>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) => setSortBy(e.target.value as 'date' | 'name')}
               className="flex-1 bg-background border border-border px-3 py-2 text-sm rounded-sm focus:outline-none focus:border-foreground"
             >
               <option value="date">Sort by Date</option>
@@ -266,7 +266,7 @@ const AdminInquiries = () => {
             </select>
             <select
               value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value as any)}
+              onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
               className="flex-1 bg-background border border-border px-3 py-2 text-sm rounded-sm focus:outline-none focus:border-foreground"
             >
               <option value="desc">Newest First</option>

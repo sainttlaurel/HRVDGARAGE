@@ -55,7 +55,7 @@ const AdminPortal = ({ onNavigateHome }: AdminPortalProps) => {
 
     // Listen for auth changes
     if (supabase) {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: {user?: {email?: string}} | null) => {
         console.log('Auth state changed:', _event, session?.user?.email)
         setIsAuthenticated(!!session?.user)
       })
@@ -99,7 +99,7 @@ const AdminPortal = ({ onNavigateHome }: AdminPortalProps) => {
         console.log('Login successful:', data.user?.email)
         // Track admin login
         if (data.user?.id) {
-          trackAdminLogin(data.user.id)
+          trackAdminLogin(true)
         }
         setEmail('')
         setPassword('')

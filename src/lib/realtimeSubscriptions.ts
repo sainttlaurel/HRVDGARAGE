@@ -8,7 +8,7 @@ import { supabase, isSupabaseAvailable } from './supabase'
 export type TableName = 'vehicles' | 'parts' | 'inquiries' | 'part_orders' | 'vehicle_inquiries' | 'business_settings'
 
 interface SubscriptionCallback {
-  (data: any[]): void
+  (data: Record<string, unknown>[]): void
 }
 
 interface SubscriptionManager {
@@ -41,7 +41,7 @@ export const subscribeToTable = (
           schema: 'public',
           table: tableName
         },
-        (payload: any) => {
+        (payload: Record<string, unknown>) => {
           console.log(`📡 Real-time update received for ${tableName}:`, payload.eventType)
           
           // Fetch latest data from Supabase
@@ -62,7 +62,7 @@ export const subscribeToTable = (
     return {
       unsubscribe: () => {
         console.log(`🔕 Unsubscribing from ${tableName}`)
-        supabase.removeChannel(subscription)
+        if (supabase) supabase.removeChannel(subscription)
       }
     }
   } catch (error) {
@@ -130,7 +130,7 @@ export const initializeRealtimeSubscriptions = (
 /**
  * Load initial data from Supabase for a table
  */
-export const loadInitialData = async (tableName: TableName): Promise<any[]> => {
+export const loadInitialData = async (tableName: TableName): Promise<Record<string, unknown>[]> => {
   if (!isSupabaseAvailable || !supabase) {
     console.warn(`⚠️ Supabase not available, loading from localStorage`)
     const saved = localStorage.getItem(tableName)

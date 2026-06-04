@@ -2,12 +2,13 @@ import { motion } from 'framer-motion'
 import { Download, Upload, Database } from 'lucide-react'
 import { useState } from 'react'
 import { exportVehicles, exportParts, exportInquiries, exportPartOrders, createFullBackup, importFromCSV, restoreFromBackup } from '../../lib/dataBackup'
+import { Vehicle, Part, Inquiry, PartOrder } from '../../lib/supabase'
 
 interface AdminBackupProps {
-  vehicles: any[]
-  parts: any[]
-  inquiries: any[]
-  orders: any[]
+  vehicles: Vehicle[]
+  parts: Part[]
+  inquiries: Inquiry[]
+  orders: PartOrder[]
 }
 
 const AdminBackup = ({ vehicles, parts, inquiries, orders }: AdminBackupProps) => {
@@ -81,7 +82,7 @@ const AdminBackup = ({ vehicles, parts, inquiries, orders }: AdminBackupProps) =
         setMessage(`Imported ${data.length} records from CSV`)
         setMessageType('success')
       } else {
-        const data = await restoreFromBackup(file)
+        const data = await restoreFromBackup(file) as { vehicles?: unknown[]; parts?: unknown[] }
         setMessage(`Backup file loaded. Contains ${data.vehicles?.length || 0} vehicles, ${data.parts?.length || 0} parts`)
         setMessageType('success')
       }

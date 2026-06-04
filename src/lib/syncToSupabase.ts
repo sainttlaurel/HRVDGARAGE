@@ -1,5 +1,8 @@
 import { supabase, isSupabaseAvailable } from './supabase'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyRecord = Record<string, any>
+
 /**
  * Sync all localStorage data to Supabase
  * This ensures data persists across browsers and devices
@@ -24,7 +27,7 @@ export const syncLocalStorageToSupabase = async () => {
             try {
               const { error } = await supabase
                 .from('inquiries')
-                .upsert([inquiry], { onConflict: 'id' })
+                .upsert([inquiry as AnyRecord], { onConflict: 'id' })
               
               if (error) {
                 console.error('❌ Error syncing inquiry:', error)
@@ -51,7 +54,7 @@ export const syncLocalStorageToSupabase = async () => {
             try {
               await supabase
                 .from('vehicles')
-                .upsert([vehicle], { onConflict: 'id' })
+                .upsert([vehicle as AnyRecord], { onConflict: 'id' })
             } catch (error) {
               console.warn('Error syncing vehicle:', error)
             }
@@ -74,7 +77,7 @@ export const syncLocalStorageToSupabase = async () => {
             try {
               await supabase
                 .from('parts')
-                .upsert([part], { onConflict: 'id' })
+                .upsert([part as AnyRecord], { onConflict: 'id' })
             } catch (error) {
               console.warn('Error syncing part:', error)
             }
@@ -97,7 +100,7 @@ export const syncLocalStorageToSupabase = async () => {
             try {
               await supabase
                 .from('part_orders')
-                .upsert([order], { onConflict: 'id' })
+                .upsert([order as AnyRecord], { onConflict: 'id' })
             } catch (error) {
               console.warn('Error syncing part order:', error)
             }
@@ -120,7 +123,7 @@ export const syncLocalStorageToSupabase = async () => {
             try {
               await supabase
                 .from('vehicle_inquiries')
-                .upsert([inquiry], { onConflict: 'id' })
+                .upsert([inquiry as AnyRecord], { onConflict: 'id' })
             } catch (error) {
               console.warn('Error syncing vehicle inquiry:', error)
             }
@@ -142,7 +145,7 @@ export const syncLocalStorageToSupabase = async () => {
           try {
             await supabase
               .from('business_settings')
-              .upsert([data], { onConflict: 'id' })
+              .upsert([data as AnyRecord], { onConflict: 'id' })
           } catch (error) {
             console.warn('Error syncing settings:', error)
           }

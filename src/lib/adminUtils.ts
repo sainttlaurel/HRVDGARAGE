@@ -58,8 +58,8 @@ export function sortInquiries(
   sortOrder: 'asc' | 'desc' = 'desc'
 ): Inquiry[] {
   const sorted = [...inquiries].sort((a, b) => {
-    let compareA: any
-    let compareB: any
+    let compareA: string | number
+    let compareB: string | number
 
     switch (sortBy) {
       case 'name':
@@ -125,8 +125,8 @@ export function sortVehicles(
   sortOrder: 'asc' | 'desc' = 'desc'
 ): Vehicle[] {
   const sorted = [...vehicles].sort((a, b) => {
-    let compareA: any
-    let compareB: any
+    let compareA: string | number
+    let compareB: string | number
 
     switch (sortBy) {
       case 'name':
@@ -193,8 +193,8 @@ export function sortParts(
   sortOrder: 'asc' | 'desc' = 'desc'
 ): Part[] {
   const sorted = [...parts].sort((a, b) => {
-    let compareA: any
-    let compareB: any
+    let compareA: string | number
+    let compareB: string | number
 
     switch (sortBy) {
       case 'name':
@@ -222,7 +222,7 @@ export function sortParts(
 /**
  * Export data to CSV
  */
-export function exportToCSV(data: any[], filename: string) {
+export function exportToCSV(data: Record<string, unknown>[], filename: string) {
   if (data.length === 0) {
     alert('No data to export')
     return

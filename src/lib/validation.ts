@@ -22,7 +22,7 @@ export const validateEmail = (email: string): boolean => {
  */
 export const validatePhone = (phone: string): boolean => {
   // Remove common separators
-  const cleaned = phone.replace(/[\s\-\(\)\.]/g, '')
+  const cleaned = phone.replace(/[\s\-().]/g, '')
   // Must be at least 7 digits and at most 15 digits (E.164 standard)
   return /^\+?[0-9]{7,15}$/.test(cleaned)
 }

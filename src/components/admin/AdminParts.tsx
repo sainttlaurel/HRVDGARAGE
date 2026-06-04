@@ -204,7 +204,7 @@ const AdminParts = () => {
         <div className={isMobile ? 'space-y-2' : 'flex gap-2'}>
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as 'date' | 'name' | 'price')}
             className="flex-1 bg-background border border-border px-3 py-2 text-sm rounded-sm focus:outline-none focus:border-foreground"
           >
             <option value="date">Sort by Date</option>
@@ -213,7 +213,7 @@ const AdminParts = () => {
           </select>
           <select
             value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value as any)}
+            onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
             className="flex-1 bg-background border border-border px-3 py-2 text-sm rounded-sm focus:outline-none focus:border-foreground"
           >
             <option value="desc">Newest First</option>

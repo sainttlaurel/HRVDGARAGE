@@ -111,9 +111,12 @@ export const useIntersectionObserver = (
     
     observer.observe(ref.current)
     
+    // Save ref to variable to use in cleanup
+    const currentRef = ref.current
+    
     return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current)
+      if (currentRef) {
+        observer.unobserve(currentRef)
       }
     }
   }, [callback])

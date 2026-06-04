@@ -42,7 +42,7 @@ const PerformanceMonitor = () => {
         setMemory(summary.memory)
         
         // Transform slowResources to include size_kb
-        const transformedResources = (summary.slowResources as any[]).map(r => ({
+        const transformedResources = (summary.slowResources as ResourceTiming[]).map(r => ({
           ...r,
           size_kb: Math.round(r.decodedBodySize / 1024)
         }))

@@ -98,7 +98,7 @@ const Parts = () => {
     // Load initial data
     const initializeData = async () => {
       const data = await loadInitialData('parts')
-      setParts(data.length > 0 ? data : defaultParts)
+      setParts((data.length > 0 ? data : defaultParts) as Part[])
       setLoading(false)
     }
 
@@ -106,7 +106,7 @@ const Parts = () => {
 
     // Subscribe to real-time changes
     const subscription = subscribeToTable('parts', (updatedParts) => {
-      setParts(updatedParts.length > 0 ? updatedParts : defaultParts)
+      setParts((updatedParts.length > 0 ? updatedParts : defaultParts) as Part[])
     })
 
     // Cleanup subscription on unmount

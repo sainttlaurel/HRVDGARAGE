@@ -18,7 +18,7 @@ export const trackPageView = (pageName: string, path: string) => {
 /**
  * Track custom event
  */
-export const trackEvent = (eventName: string, eventData?: Record<string, any>) => {
+export const trackEvent = (eventName: string, eventData?: Record<string, unknown>) => {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', eventName, eventData)
   }
@@ -197,8 +197,8 @@ export const initializeGoogleAnalytics = (measurementId?: string) => {
 
   // Initialize gtag
   window.dataLayer = window.dataLayer || []
-  function gtag(..._args: any[]) {
-    ;(window.dataLayer as any[]).push(arguments)
+  function gtag(...args: unknown[]) {
+    (window.dataLayer as unknown[]).push(args)
   }
   window.gtag = gtag
   gtag('js', new Date())
@@ -211,7 +211,7 @@ export const initializeGoogleAnalytics = (measurementId?: string) => {
 // Extend window interface for TypeScript
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void
-    dataLayer?: any[]
+    gtag?: (...args: unknown[]) => void
+    dataLayer?: unknown[]
   }
 }

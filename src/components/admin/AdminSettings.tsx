@@ -115,28 +115,28 @@ const AdminSettings = () => {
             <div className="p-4 bg-background rounded-sm border border-border">
               <p className="label-small mb-2">Total Inquiries</p>
               <p className="text-3xl font-serif">
-                {JSON.parse(localStorage.getItem('inquiries') || '[]').length}
+                {(JSON.parse(localStorage.getItem('inquiries') || '[]') as Record<string, unknown>[]).length}
               </p>
             </div>
 
             <div className="p-4 bg-background rounded-sm border border-border">
               <p className="label-small mb-2">Vehicles Listed</p>
               <p className="text-3xl font-serif">
-                {JSON.parse(localStorage.getItem('vehicles') || '[]').length}
+                {(JSON.parse(localStorage.getItem('vehicles') || '[]') as Record<string, unknown>[]).length}
               </p>
             </div>
 
             <div className="p-4 bg-background rounded-sm border border-border">
               <p className="label-small mb-2">New Inquiries</p>
               <p className="text-3xl font-serif">
-                {JSON.parse(localStorage.getItem('inquiries') || '[]').filter((i: any) => i.status === 'new').length}
+                {(JSON.parse(localStorage.getItem('inquiries') || '[]') as Record<string, unknown>[]).filter((i: Record<string, unknown>) => i.status === 'new').length}
               </p>
             </div>
 
             <div className="p-4 bg-background rounded-sm border border-border">
               <p className="label-small mb-2">Available Vehicles</p>
               <p className="text-3xl font-serif">
-                {JSON.parse(localStorage.getItem('vehicles') || '[]').filter((v: any) => v.available).length}
+                {(JSON.parse(localStorage.getItem('vehicles') || '[]') as Record<string, unknown>[]).filter((v: Record<string, unknown>) => v.available).length}
               </p>
             </div>
           </div>

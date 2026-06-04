@@ -92,7 +92,7 @@ export function setCanonicalURL(url: string) {
 /**
  * Generate JSON-LD structured data
  */
-export function generateStructuredData(data: Record<string, any>) {
+export function generateStructuredData(data: Record<string, unknown>) {
   const script = document.createElement('script')
   script.type = 'application/ld+json'
   script.textContent = JSON.stringify(data)
