@@ -51,6 +51,17 @@ const VehicleCard = ({ image, images, brand, model, year, price, location, descr
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.6 }}
             loading="lazy"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement
+              target.style.display = 'none'
+              const parent = target.closest('.relative')
+              if (parent && !parent.querySelector('.img-placeholder')) {
+                const placeholder = document.createElement('div')
+                placeholder.className = 'img-placeholder w-full h-full flex items-center justify-center bg-card'
+                placeholder.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="opacity-20"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>'
+                parent.prepend(placeholder)
+              }
+            }}
           />
         </picture>
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60" />
