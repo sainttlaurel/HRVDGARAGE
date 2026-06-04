@@ -4,89 +4,8 @@ import PartCard from './PartCard'
 import PartModal from './PartModal'
 import PartsPurchaseModal from './PartsPurchaseModal'
 import { Part, partsService } from '../lib/supabase'
-import { subscribeToTable, loadInitialData } from '../lib/realtimeSubscriptions'
+import { subscribeToTable } from '../lib/realtimeSubscriptions'
 import { onDataChange } from '../lib/dataEvents'
-
-const defaultParts: Part[] = [
-  {
-    id: '1',
-    image: '/image/parts/sample-part.jpg',
-    category: 'Suspension',
-    name: 'Coilover Kit',
-    brand: 'BC Racing',
-    price: '₱45,000',
-    condition: 'Brand New',
-    description: 'Adjustable coilover suspension kit. Height and damping adjustable. Fits various applications.',
-    available: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '2',
-    image: '/image/parts/sample-part.jpg',
-    category: 'Exhaust',
-    name: 'Cat-Back Exhaust',
-    brand: 'HKS',
-    price: '₱35,000',
-    condition: 'Used - Excellent',
-    description: 'Stainless steel cat-back exhaust system. Deep tone, minimal drone. Complete with hardware.',
-    available: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '3',
-    image: '/image/parts/sample-part.jpg',
-    category: 'Wheels',
-    name: 'Forged Wheels 18"',
-    brand: 'Rays Volk Racing',
-    price: '₱120,000',
-    condition: 'Used - Good',
-    description: 'Set of 4 genuine Rays Volk Racing TE37. 18x9.5 +22 offset. Minor curb rash, structurally perfect.',
-    available: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '4',
-    image: '/image/parts/sample-part.jpg',
-    category: 'Engine',
-    name: 'Turbo Kit',
-    brand: 'Garrett',
-    price: '₱85,000',
-    condition: 'Brand New',
-    description: 'Complete turbo kit with manifold, downpipe, and oil lines. Supports up to 400hp.',
-    available: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '5',
-    image: '/image/parts/sample-part.jpg',
-    category: 'Interior',
-    name: 'Racing Seats (Pair)',
-    brand: 'Bride',
-    price: '₱55,000',
-    condition: 'Used - Excellent',
-    description: 'Pair of Bride Low Max racing seats. FRP shell, excellent condition. Side mounts included.',
-    available: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '6',
-    image: '/image/parts/sample-part.jpg',
-    category: 'Electronics',
-    name: 'ECU Tuner',
-    brand: 'Hondata',
-    price: '₱28,000',
-    condition: 'Used - Good',
-    description: 'Hondata FlashPro for Honda/Acura. Includes cable and software license. Fully functional.',
-    available: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-]
 
 const Parts = () => {
   const [parts, setParts] = useState<Part[]>([])
@@ -99,7 +18,7 @@ const Parts = () => {
   const reloadParts = useCallback(async () => {
     try {
       const data = await partsService.getAll()
-      setParts((data.length > 0 ? data : defaultParts) as Part[])
+      setParts(data)
     } catch (error) {
       console.error('Error reloading parts:', error)
     }
@@ -108,8 +27,8 @@ const Parts = () => {
   useEffect(() => {
     // Load initial data
     const initializeData = async () => {
-      const data = await loadInitialData('parts')
-      setParts((data.length > 0 ? data : defaultParts) as Part[])
+      const data = await partsService.getAll()
+      setParts(data)
       setLoading(false)
     }
 
@@ -117,7 +36,7 @@ const Parts = () => {
 
     // Subscribe to Supabase real-time changes (works when Supabase is configured)
     const subscription = subscribeToTable('parts', (updatedParts) => {
-      setParts((updatedParts.length > 0 ? updatedParts : defaultParts) as Part[])
+      setParts(updatedParts as unknown as Part[])
     })
 
     const unsubscribeDataChange = onDataChange('parts', () => {
