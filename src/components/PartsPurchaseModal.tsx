@@ -17,14 +17,14 @@ const PartsPurchaseModal = ({ isOpen, onClose, part }: PartsPurchaseModalProps) 
   // Declare all hooks at component top level BEFORE any early returns
   const [formData, setFormData] = useState({
     quantity: 1,
-    customerName: '',
-    customerEmail: '',
-    customerPhone: '',
-    customerCar: '',
+    customername: '',
+    customeremail: '',
+    customerphone: '',
+    customercar: '',
     address: '',
-    paymentMethod: 'cash',
-    deliveryOption: 'pickup',
-    facebookProfile: '',
+    paymentmethod: 'cash',
+    deliveryoption: 'pickup',
+    facebookprofile: '',
     notes: ''
   })
   const [loading, setLoading] = useState(false)
@@ -60,19 +60,19 @@ const PartsPurchaseModal = ({ isOpen, onClose, part }: PartsPurchaseModalProps) 
     try {
       // Create order in database
       await partOrdersService.create({
-        partId: part.id,
-        partName: part.name,
-        partBrand: part.brand,
-        partPrice: part.price,
+        partid: part.id,
+        partname: part.name,
+        partbrand: part.brand,
+        partprice: part.price,
         quantity: formData.quantity,
-        customerName: formData.customerName,
-        customerEmail: formData.customerEmail,
-        customerPhone: formData.customerPhone,
-        customerCar: formData.customerCar,
+        customername: formData.customerName,
+        customeremail: formData.customerEmail,
+        customerphone: formData.customerPhone,
+        customercar: formData.customerCar,
         address: formData.address,
-        paymentMethod: formData.paymentMethod,
-        deliveryOption: formData.deliveryOption,
-        facebookProfile: formData.facebookProfile,
+        paymentmethod: formData.paymentMethod,
+        deliveryoption: formData.deliveryOption,
+        facebookprofile: formData.facebookProfile,
         notes: formData.notes,
         status: 'new'
       })
@@ -82,14 +82,14 @@ const PartsPurchaseModal = ({ isOpen, onClose, part }: PartsPurchaseModalProps) 
 
       // Send email notification to admin
       const emailSent = await sendNewPartOrderNotification({
-        partName: part.name,
-        partBrand: part.brand,
-        partPrice: part.price,
+        partname: part.name,
+        partbrand: part.brand,
+        partprice: part.price,
         quantity: formData.quantity,
-        customerName: formData.customerName,
-        customerEmail: formData.customerEmail,
-        customerPhone: formData.customerPhone,
-        deliveryOption: formData.deliveryOption
+        customername: formData.customerName,
+        customeremail: formData.customerEmail,
+        customerphone: formData.customerPhone,
+        deliveryoption: formData.deliveryOption
       })
 
       if (emailSent) {
@@ -104,14 +104,14 @@ const PartsPurchaseModal = ({ isOpen, onClose, part }: PartsPurchaseModalProps) 
         setSubmitted(false)
         setFormData({
           quantity: 1,
-          customerName: '',
-          customerEmail: '',
-          customerPhone: '',
-          customerCar: '',
+          customername: '',
+          customeremail: '',
+          customerphone: '',
+          customercar: '',
           address: '',
-          paymentMethod: 'cash',
-          deliveryOption: 'pickup',
-          facebookProfile: '',
+          paymentmethod: 'cash',
+          deliveryoption: 'pickup',
+          facebookprofile: '',
           notes: ''
         })
       }, 2000)

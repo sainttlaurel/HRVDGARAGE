@@ -26,11 +26,10 @@ try {
 
 export { supabase, supabaseError, isSupabaseAvailable }
 
-// DB uses lowercase column names: createdat, updatedat
+// All DB columns are fully lowercase (no camelCase)
 const now = () => new Date().toISOString()
 const uuid = () => crypto.randomUUID()
 
-/** Supabase-only reads */
 async function fetchAllRows<T>(table: string): Promise<T[]> {
   if (!isSupabaseAvailable || !supabase) return []
   const { data, error } = await supabase
@@ -61,12 +60,12 @@ async function fetchSingleRow<T>(table: string): Promise<T | null> {
   return data as T
 }
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ─── Types (match exact DB column names) ─────────────────────────────────────
 
 export interface Inquiry {
   id: string
-  firstName: string
-  lastName: string
+  firstname: string
+  lastname: string
   email: string
   phone: string
   message: string
@@ -93,11 +92,11 @@ export interface Vehicle {
 
 export interface BusinessSettings {
   id: string
-  businessName: string
+  businessname: string
   email: string
   phone: string
   location: string
-  businessHours: string
+  businesshours: string
   createdat: string
   updatedat: string
 }
@@ -118,19 +117,19 @@ export interface Part {
 
 export interface PartOrder {
   id: string
-  partId: string
-  partName: string
-  partBrand: string
-  partPrice: string
+  partid: string
+  partname: string
+  partbrand: string
+  partprice: string
   quantity: number
-  customerName: string
-  customerEmail: string
-  customerPhone: string
-  customerCar: string
+  customername: string
+  customeremail: string
+  customerphone: string
+  customercar: string
   address: string
-  paymentMethod: string
-  deliveryOption: string
-  facebookProfile?: string
+  paymentmethod: string
+  deliveryoption: string
+  facebookprofile?: string
   notes?: string
   status: 'new' | 'contacted' | 'confirmed' | 'completed'
   createdat: string
@@ -139,17 +138,17 @@ export interface PartOrder {
 
 export interface VehicleInquiry {
   id: string
-  vehicleId: string
-  vehicleBrand: string
-  vehicleModel: string
-  vehicleYear: number
-  vehiclePrice: string
-  customerName: string
-  customerEmail: string
-  customerPhone: string
-  inquiryType: 'purchase' | 'trade-in' | 'financing' | 'other'
+  vehicleid: string
+  vehiclebrand: string
+  vehiclemodel: string
+  vehicleyear: number
+  vehicleprice: string
+  customername: string
+  customeremail: string
+  customerphone: string
+  inquirytype: 'purchase' | 'trade-in' | 'financing' | 'other'
   message: string
-  facebookProfile?: string
+  facebookprofile?: string
   status: 'new' | 'contacted' | 'confirmed' | 'completed'
   createdat: string
   updatedat: string
@@ -161,10 +160,9 @@ export const inquiryService = {
   async getAll() { return fetchAllRows<Inquiry>('inquiries') },
   async getById(id: string) { return fetchRowById<Inquiry>('inquiries', id) },
 
-  async create(inquiry: Omit<Inquiry, 'id' | 'createdat' | 'updatedat'>) {
+  async create(inquiry: { firstname: string; lastname: string; email: string; phone: string; message: string; status: string }) {
     const row = { id: uuid(), ...inquiry, createdat: now(), updatedat: now() }
     if (!isSupabaseAvailable || !supabase) {
-      // Fallback for public contact form
       const saved = localStorage.getItem('inquiries')
       const list = saved ? JSON.parse(saved) : []
       list.push(row)
@@ -231,7 +229,7 @@ export const vehicleService = {
 export const settingsService = {
   async get() { return fetchSingleRow<BusinessSettings>('business_settings') },
 
-  async update(updates: Partial<BusinessSettings>) {
+  async update(updates: { businessname: string; email: string; phone: string; location: string; businesshours: string }) {
     if (!isSupabaseAvailable || !supabase) throw new Error('Supabase not available')
     const payload = { ...updates, updatedat: now() }
     const existing = await this.get()

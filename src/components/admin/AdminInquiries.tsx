@@ -135,7 +135,7 @@ const AdminInquiries = () => {
             <div className="space-y-3">
               <div>
                 <p className="label-small mb-1">Name</p>
-                <p className="text-sm">{selectedInquiry.firstName} {selectedInquiry.lastName}</p>
+                <p className="text-sm">{selectedInquiry.firstname} {selectedInquiry.lastname}</p>
               </div>
 
               <div>
@@ -313,7 +313,7 @@ const AdminInquiries = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <h3 className="font-medium text-sm sm:text-base">
-                        {inquiry.firstName} {inquiry.lastName}
+                        {inquiry.firstname} {inquiry.lastname}
                       </h3>
                       <span className={`text-xs px-2 py-1 rounded-sm ${getStatusColor(inquiry.status)}`}>
                         {inquiry.status}
@@ -345,7 +345,7 @@ const AdminInquiries = () => {
           <div className="space-y-4 mb-6">
             <div>
               <p className="label-small mb-2">Name</p>
-              <p>{selectedInquiry.firstName} {selectedInquiry.lastName}</p>
+              <p>{selectedInquiry.firstname} {selectedInquiry.lastname}</p>
             </div>
 
             <div>

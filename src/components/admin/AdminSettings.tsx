@@ -35,11 +35,11 @@ const AdminSettings = () => {
 
         if (stored) {
           setSettings({
-            businessName: stored.businessName,
+            businessName: stored.businessname,
             email: stored.email,
             phone: stored.phone,
             location: stored.location,
-            businessHours: stored.businessHours,
+            businessHours: stored.businesshours,
           })
         }
 
@@ -68,7 +68,13 @@ const AdminSettings = () => {
   const handleSave = async () => {
     setSaveError(null)
     try {
-      await settingsService.update(settings)
+      await settingsService.update({
+        businessname: settings.businessName,
+        email: settings.email,
+        phone: settings.phone,
+        location: settings.location,
+        businesshours: settings.businessHours,
+      })
       dispatchDataChange('business_settings', 'update')
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)

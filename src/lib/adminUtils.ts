@@ -21,8 +21,8 @@ export function searchInquiries(inquiries: Inquiry[], searchTerm: string): Inqui
   const term = searchTerm.toLowerCase()
   return inquiries.filter(
     (inq) =>
-      inq.firstName.toLowerCase().includes(term) ||
-      inq.lastName.toLowerCase().includes(term) ||
+      inq.firstname.toLowerCase().includes(term) ||
+      inq.lastname.toLowerCase().includes(term) ||
       inq.email.toLowerCase().includes(term) ||
       inq.phone.includes(term) ||
       inq.message.toLowerCase().includes(term)
@@ -63,8 +63,8 @@ export function sortInquiries(
 
     switch (sortBy) {
       case 'name':
-        compareA = `${a.firstName} ${a.lastName}`.toLowerCase()
-        compareB = `${b.firstName} ${b.lastName}`.toLowerCase()
+        compareA = `${a.firstname} ${a.lastname}`.toLowerCase()
+        compareB = `${b.firstname} ${b.lastname}`.toLowerCase()
         break
       case 'date':
       default:
@@ -267,8 +267,8 @@ export function exportToCSV(data: Record<string, unknown>[], filename: string) {
  */
 export function exportInquiries(inquiries: Inquiry[]) {
   const data = inquiries.map((inq) => ({
-    'First Name': inq.firstName,
-    'Last Name': inq.lastName,
+    'First Name': inq.firstname,
+    'Last Name': inq.lastname,
     Email: inq.email,
     Phone: inq.phone,
     Message: inq.message,
@@ -320,12 +320,12 @@ export function exportParts(parts: Part[]) {
  */
 export function exportPartOrders(orders: PartOrder[]) {
   const data = orders.map((o) => ({
-    'Part Name': o.partName,
+    'Part Name': o.partname,
     Quantity: o.quantity,
-    'Customer Name': o.customerName,
-    'Customer Email': o.customerEmail,
+    'Customer Name': o.customername,
+    'Customer Email': o.customeremail,
     'Customer Phone': o.customerPhone,
-    'Delivery Option': o.deliveryOption,
+    'Delivery Option': o.deliveryoption,
     Status: o.status,
     'Created At': new Date(o.createdat).toLocaleDateString(),
   }))

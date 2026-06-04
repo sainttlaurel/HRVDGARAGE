@@ -85,9 +85,9 @@ const AdminPartOrders = () => {
     if (!searchTerm.trim()) return true
     const term = searchTerm.toLowerCase()
     return (
-      o.partName.toLowerCase().includes(term) ||
-      o.customerName.toLowerCase().includes(term) ||
-      o.customerEmail.toLowerCase().includes(term) ||
+      o.partname.toLowerCase().includes(term) ||
+      o.customername.toLowerCase().includes(term) ||
+      o.customeremail.toLowerCase().includes(term) ||
       o.customerPhone.includes(term)
     )
   })
@@ -228,7 +228,7 @@ const AdminPartOrders = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="font-serif text-xl">
-                      {order.partBrand} {order.partName}
+                      {order.partbrand} {order.partname}
                     </h3>
                     <span className={`px-3 py-1 rounded-sm text-xs font-medium ${getStatusColor(order.status)}`}>
                       {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
@@ -254,15 +254,15 @@ const AdminPartOrders = () => {
                 </div>
                 <div>
                   <p className="text-xs text-foreground-muted mb-1">Price</p>
-                  <p className="font-medium">{order.partPrice}</p>
+                  <p className="font-medium">{order.partprice}</p>
                 </div>
                 <div>
                   <p className="text-xs text-foreground-muted mb-1">Payment</p>
-                  <p className="font-medium text-sm capitalize">{order.paymentMethod.replace('_', ' ')}</p>
+                  <p className="font-medium text-sm capitalize">{order.paymentmethod.replace('_', ' ')}</p>
                 </div>
                 <div>
                   <p className="text-xs text-foreground-muted mb-1">Delivery</p>
-                  <p className="font-medium text-sm capitalize">{order.deliveryOption}</p>
+                  <p className="font-medium text-sm capitalize">{order.deliveryoption}</p>
                 </div>
               </div>
 
@@ -291,7 +291,7 @@ const AdminPartOrders = () => {
                         </div>
                         <div>
                           <p className="text-xs text-foreground-muted">Name</p>
-                          <p className="font-medium">{order.customerName}</p>
+                          <p className="font-medium">{order.customername}</p>
                         </div>
                       </div>
 
@@ -301,8 +301,8 @@ const AdminPartOrders = () => {
                         </div>
                         <div>
                           <p className="text-xs text-foreground-muted">Phone</p>
-                          <a href={`tel:${order.customerPhone}`} className="font-medium hover:text-motorsport-red transition-colors">
-                            {order.customerPhone}
+                          <a href={`tel:${order.customerphone}`} className="font-medium hover:text-motorsport-red transition-colors">
+                            {order.customerphone}
                           </a>
                         </div>
                       </div>
@@ -313,13 +313,13 @@ const AdminPartOrders = () => {
                         </div>
                         <div>
                           <p className="text-xs text-foreground-muted">Email</p>
-                          <a href={`mailto:${order.customerEmail}`} className="font-medium hover:text-motorsport-red transition-colors">
-                            {order.customerEmail}
+                          <a href={`mailto:${order.customeremail}`} className="font-medium hover:text-motorsport-red transition-colors">
+                            {order.customeremail}
                           </a>
                         </div>
                       </div>
 
-                      {order.facebookProfile && (
+                      {order.facebookprofile && (
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full border border-border flex items-center justify-center flex-shrink-0">
                             <ExternalLink size={16} />
@@ -327,12 +327,12 @@ const AdminPartOrders = () => {
                           <div>
                             <p className="text-xs text-foreground-muted">Facebook</p>
                             <a 
-                              href={order.facebookProfile.startsWith('http') ? order.facebookProfile : `https://${order.facebookProfile}`}
+                              href={order.facebookprofile.startsWith('http') ? order.facebookprofile : `https://${order.facebookprofile}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="font-medium hover:text-motorsport-red transition-colors break-all"
                             >
-                              {order.facebookProfile}
+                              {order.facebookprofile}
                             </a>
                           </div>
                         </div>
@@ -344,14 +344,14 @@ const AdminPartOrders = () => {
                   <div>
                     <h4 className="font-medium mb-3 text-sm">Delivery Information</h4>
                     <div className="space-y-2">
-                      {order.customerCar && (
+                      {order.customercar && (
                         <div className="flex items-start gap-3">
                           <div className="w-8 h-8 rounded-full border border-border flex items-center justify-center flex-shrink-0 mt-1">
                             <MessageSquare size={16} />
                           </div>
                           <div>
                             <p className="text-xs text-foreground-muted">Vehicle</p>
-                            <p className="font-medium">{order.customerCar}</p>
+                            <p className="font-medium">{order.customercar}</p>
                           </div>
                         </div>
                       )}
@@ -372,7 +372,7 @@ const AdminPartOrders = () => {
                         </div>
                         <div>
                           <p className="text-xs text-foreground-muted">Payment Method</p>
-                          <p className="font-medium capitalize">{order.paymentMethod.replace('_', ' ')}</p>
+                          <p className="font-medium capitalize">{order.paymentmethod.replace('_', ' ')}</p>
                         </div>
                       </div>
 
@@ -382,7 +382,7 @@ const AdminPartOrders = () => {
                         </div>
                         <div>
                           <p className="text-xs text-foreground-muted">Delivery Option</p>
-                          <p className="font-medium capitalize">{order.deliveryOption}</p>
+                          <p className="font-medium capitalize">{order.deliveryoption}</p>
                         </div>
                       </div>
                     </div>

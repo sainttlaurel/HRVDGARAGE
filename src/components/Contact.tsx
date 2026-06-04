@@ -41,8 +41,8 @@ const Contact = () => {
     try {
       // Save inquiry to database
       await inquiryService.create({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        firstname: formData.firstName,
+        lastname: formData.lastName,
         email: formData.email,
         phone: formData.phone,
         message: formData.message,

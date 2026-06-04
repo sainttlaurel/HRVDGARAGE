@@ -192,11 +192,11 @@ export const exportInquiries = (inquiries: Inquiry[]) => {
 export const exportPartOrders = (orders: PartOrder[]) => {
   const data = orders.map((o) => ({
     id: o.id,
-    partId: o.partId,
-    partName: o.partName,
+    partId: o.partid,
+    partName: o.partname,
     quantity: o.quantity,
-    customerName: o.customerName,
-    customerEmail: o.customerEmail,
+    customerName: o.customername,
+    customerEmail: o.customeremail,
     status: o.status,
     createdat: o.createdat
   }))
