@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import VehicleCard from './VehicleCard'
 import VehicleModal from './VehicleModal'
 import { subscribeToTable, loadInitialData } from '../lib/realtimeSubscriptions'
+import { onDataChange, onStorageChange } from '../lib/dataEvents'
+import { vehicleService } from '../lib/supabase'
 
 interface Vehicle {
   id: string
@@ -135,6 +137,16 @@ const Inventory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
 
+  // Reload fresh data from the service layer
+  const reloadVehicles = useCallback(async () => {
+    try {
+      const data = await vehicleService.getAll()
+      setVehicles((data.length > 0 ? data : defaultVehicles) as Vehicle[])
+    } catch (error) {
+      console.error('Error reloading vehicles:', error)
+    }
+  }, [])
+
   useEffect(() => {
     // Load initial data
     const initializeData = async () => {
@@ -145,18 +157,30 @@ const Inventory = () => {
 
     initializeData()
 
-    // Subscribe to real-time changes
+    // Subscribe to Supabase real-time changes (works when Supabase is configured)
     const subscription = subscribeToTable('vehicles', (updatedVehicles) => {
       setVehicles((updatedVehicles.length > 0 ? updatedVehicles : defaultVehicles) as Vehicle[])
     })
 
-    // Cleanup subscription on unmount
+    // Subscribe to custom data events (same-tab admin changes — always works)
+    const unsubscribeDataChange = onDataChange('vehicles', () => {
+      reloadVehicles()
+    })
+
+    // Subscribe to cross-tab localStorage changes (admin in different tab)
+    const unsubscribeStorage = onStorageChange('vehicles', () => {
+      reloadVehicles()
+    })
+
+    // Cleanup all subscriptions on unmount
     return () => {
       if (subscription) {
         subscription.unsubscribe()
       }
+      unsubscribeDataChange()
+      unsubscribeStorage()
     }
-  }, [])
+  }, [reloadVehicles])
 
   // Filter to show only available vehicles
   const availableVehicles = vehicles.filter(v => v.available)

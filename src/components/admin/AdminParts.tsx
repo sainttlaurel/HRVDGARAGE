@@ -7,6 +7,7 @@ import {
   exportParts,
   getPartStats,
 } from '../../lib/adminUtils'
+import { dispatchDataChange } from '../../lib/dataEvents'
 
 const AdminParts = () => {
   const [parts, setParts] = useState<Part[]>([])
@@ -68,6 +69,7 @@ const AdminParts = () => {
         setParts(updated)
         setEditingId(null)
         setEditForm({})
+        dispatchDataChange('parts', 'update')
       } catch (error) {
         console.error('Error saving part:', error)
       }
@@ -80,6 +82,7 @@ const AdminParts = () => {
         await partsService.delete(id)
         const updated = parts.filter(p => p.id !== id)
         setParts(updated)
+        dispatchDataChange('parts', 'delete')
       } catch (error) {
         console.error('Error deleting part:', error)
       }
@@ -95,6 +98,7 @@ const AdminParts = () => {
           p.id === id ? { ...p, available: !p.available } : p
         )
         setParts(updated)
+        dispatchDataChange('parts', 'update')
       }
     } catch (error) {
       console.error('Error toggling availability:', error)
@@ -130,6 +134,7 @@ const AdminParts = () => {
         available: true
       })
       setShowAddForm(false)
+      dispatchDataChange('parts', 'create')
     } catch (error) {
       console.error('Error adding part:', error)
     }

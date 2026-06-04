@@ -7,6 +7,7 @@ import AdminParts from '../components/admin/AdminParts'
 import AdminPartOrders from '../components/admin/AdminPartOrders'
 import AdminSettings from '../components/admin/AdminSettings'
 import PerformanceMonitor from '../components/PerformanceMonitor'
+import SupabaseConnectionIndicator from '../components/admin/SupabaseConnectionIndicator'
 import Toast from '../components/Toast'
 import { supabase } from '../lib/supabase'
 import { loadFromSupabaseToLocalStorage, syncLocalStorageToSupabase } from '../lib/syncToSupabase'
@@ -163,7 +164,10 @@ const AdminPortal = ({ onNavigateHome }: AdminPortalProps) => {
           animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-md card-luxury p-8 relative z-10"
         >
-          <h1 className="font-serif text-4xl mb-2">Admin Portal</h1>
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="font-serif text-4xl">Admin Portal</h1>
+            <SupabaseConnectionIndicator />
+          </div>
           <p className="text-foreground-muted mb-8">Sign in with your Supabase account</p>
 
           <form onSubmit={handleLogin} className="space-y-6">
@@ -222,7 +226,10 @@ const AdminPortal = ({ onNavigateHome }: AdminPortalProps) => {
         className="fixed top-0 left-0 right-0 z-40 backdrop-blur-xl bg-background/80 border-b border-border"
       >
         <div className="container-luxury flex items-center justify-between h-20">
-          <h1 className="font-serif text-2xl">HRVD Admin</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="font-serif text-2xl">HRVD Admin</h1>
+            <SupabaseConnectionIndicator />
+          </div>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
@@ -318,6 +325,7 @@ const AdminPortal = ({ onNavigateHome }: AdminPortalProps) => {
             className="md:hidden border-t border-border bg-background/95 backdrop-blur-sm"
           >
             <div className="container-luxury py-4 space-y-4">
+              <SupabaseConnectionIndicator />
               <button
                 onClick={handleSync}
                 disabled={syncing}

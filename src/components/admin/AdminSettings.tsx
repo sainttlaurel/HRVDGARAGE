@@ -1,27 +1,90 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Save } from 'lucide-react'
+import { settingsService, inquiryService, vehicleService } from '../../lib/supabase'
+import { dispatchDataChange } from '../../lib/dataEvents'
+
+const defaultSettings = {
+  businessName: 'HRVD Car Trading',
+  email: 'hrvdcartrading@gmail.com',
+  phone: '+63 912 345 6789',
+  location: 'Quezon City, Metro Manila, Philippines',
+  businessHours: 'Mon - Sun: 9:00 AM - 6:00 PM',
+}
 
 const AdminSettings = () => {
-  const [settings, setSettings] = useState({
-    businessName: 'HRVD Car Trading',
-    email: 'hrvdcartrading@gmail.com',
-    phone: '+63 912 345 6789',
-    location: 'Quezon City, Metro Manila, Philippines',
-    businessHours: 'Mon - Sun: 9:00 AM - 6:00 PM',
+  const [settings, setSettings] = useState(defaultSettings)
+  const [saved, setSaved] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [stats, setStats] = useState({
+    totalInquiries: 0,
+    newInquiries: 0,
+    vehiclesListed: 0,
+    availableVehicles: 0,
   })
 
-  const [saved, setSaved] = useState(false)
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [stored, inquiries, vehicles] = await Promise.all([
+          settingsService.get(),
+          inquiryService.getAll(),
+          vehicleService.getAll(),
+        ])
+
+        if (stored) {
+          setSettings({
+            businessName: stored.businessName,
+            email: stored.email,
+            phone: stored.phone,
+            location: stored.location,
+            businessHours: stored.businessHours,
+          })
+        }
+
+        setStats({
+          totalInquiries: inquiries.length,
+          newInquiries: inquiries.filter((i) => i.status === 'new').length,
+          vehiclesListed: vehicles.length,
+          availableVehicles: vehicles.filter((v) => v.available).length,
+        })
+      } catch (error) {
+        console.error('Error loading settings:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    load()
+  }, [])
 
   const handleChange = (field: string, value: string) => {
-    setSettings(prev => ({ ...prev, [field]: value }))
+    setSettings((prev) => ({ ...prev, [field]: value }))
     setSaved(false)
+    setSaveError(null)
   }
 
-  const handleSave = () => {
-    localStorage.setItem('businessSettings', JSON.stringify(settings))
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+  const handleSave = async () => {
+    setSaveError(null)
+    try {
+      await settingsService.update(settings)
+      dispatchDataChange('business_settings', 'update')
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch (error) {
+      console.error('Error saving settings:', error)
+      setSaveError('Failed to save settings. Check Supabase connection.')
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="max-w-2xl">
+        <h2 className="heading-section mb-8">Settings</h2>
+        <p className="text-foreground-muted">Loading settings…</p>
+      </div>
+    )
   }
 
   return (
@@ -96,61 +159,56 @@ const AdminSettings = () => {
 
           <div className="space-y-4 p-4 bg-background rounded-sm border border-border">
             <p className="text-sm text-foreground-muted">
-              Current admin password: <span className="font-mono">admin123</span>
+              Admin access uses Supabase Auth. Manage users in your Supabase dashboard.
             </p>
             <p className="text-xs text-foreground-faint">
-              ⚠️ In production, implement proper authentication with secure password hashing
+              Do not store passwords in the client — use Supabase Auth policies in production.
             </p>
-            <button className="btn-secondary">
-              Change Password
-            </button>
           </div>
         </div>
 
         {/* Statistics */}
         <div className="border-t border-border pt-8">
           <h3 className="font-serif text-2xl mb-6">Statistics</h3>
+          <p className="text-xs text-foreground-faint mb-4">Live counts from Supabase</p>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 bg-background rounded-sm border border-border">
               <p className="label-small mb-2">Total Inquiries</p>
-              <p className="text-3xl font-serif">
-                {(JSON.parse(localStorage.getItem('inquiries') || '[]') as Record<string, unknown>[]).length}
-              </p>
+              <p className="text-3xl font-serif">{stats.totalInquiries}</p>
             </div>
 
             <div className="p-4 bg-background rounded-sm border border-border">
               <p className="label-small mb-2">Vehicles Listed</p>
-              <p className="text-3xl font-serif">
-                {(JSON.parse(localStorage.getItem('vehicles') || '[]') as Record<string, unknown>[]).length}
-              </p>
+              <p className="text-3xl font-serif">{stats.vehiclesListed}</p>
             </div>
 
             <div className="p-4 bg-background rounded-sm border border-border">
               <p className="label-small mb-2">New Inquiries</p>
-              <p className="text-3xl font-serif">
-                {(JSON.parse(localStorage.getItem('inquiries') || '[]') as Record<string, unknown>[]).filter((i: Record<string, unknown>) => i.status === 'new').length}
-              </p>
+              <p className="text-3xl font-serif">{stats.newInquiries}</p>
             </div>
 
             <div className="p-4 bg-background rounded-sm border border-border">
               <p className="label-small mb-2">Available Vehicles</p>
-              <p className="text-3xl font-serif">
-                {(JSON.parse(localStorage.getItem('vehicles') || '[]') as Record<string, unknown>[]).filter((v: Record<string, unknown>) => v.available).length}
-              </p>
+              <p className="text-3xl font-serif">{stats.availableVehicles}</p>
             </div>
           </div>
         </div>
 
         {/* Save Button */}
         <div className="border-t border-border pt-8 flex items-center justify-between">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: saved ? 1 : 0 }}
-            className="text-green-400 text-sm flex items-center gap-2"
-          >
-            ✓ Settings saved successfully
-          </motion.div>
+          <div className="space-y-1">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: saved ? 1 : 0 }}
+              className="text-green-400 text-sm flex items-center gap-2"
+            >
+              ✓ Settings saved to Supabase
+            </motion.div>
+            {saveError && (
+              <p className="text-red-400 text-sm">{saveError}</p>
+            )}
+          </div>
 
           <button
             onClick={handleSave}

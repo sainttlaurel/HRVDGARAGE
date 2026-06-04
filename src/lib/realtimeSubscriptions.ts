@@ -3,6 +3,7 @@
  * Replaces polling with instant updates using Supabase real-time subscriptions
  */
 
+import { dispatchDataChange } from './dataEvents'
 import { supabase, isSupabaseAvailable } from './supabase'
 
 export type TableName = 'vehicles' | 'parts' | 'inquiries' | 'part_orders' | 'vehicle_inquiries' | 'business_settings'
@@ -72,7 +73,7 @@ export const subscribeToTable = (
 }
 
 /**
- * Fetch latest data from Supabase and update localStorage
+ * Fetch latest data from Supabase and notify listeners
  */
 const fetchAndUpdateTable = async (
   tableName: TableName,
@@ -92,11 +93,7 @@ const fetchAndUpdateTable = async (
     }
 
     if (data) {
-      // Update localStorage
-      localStorage.setItem(tableName, JSON.stringify(data))
-      console.log(`✅ Updated ${tableName} in localStorage (${data.length} items)`)
-      
-      // Call callback with new data
+      console.log(`✅ Real-time refresh for ${tableName} (${data.length} items)`)
       onDataChange(data)
     }
   } catch (error) {
@@ -128,40 +125,73 @@ export const initializeRealtimeSubscriptions = (
 }
 
 /**
- * Load initial data from Supabase for a table
+ * Load initial data from Supabase for a table (single source of truth).
+ * Returns an empty array when Supabase is unavailable or the request fails.
  */
 export const loadInitialData = async (tableName: TableName): Promise<Record<string, unknown>[]> => {
   if (!isSupabaseAvailable || !supabase) {
-    console.warn(`⚠️ Supabase not available, loading from localStorage`)
-    const saved = localStorage.getItem(tableName)
-    return saved ? JSON.parse(saved) : []
-  }
-
-  try {
-    const { data, error } = await supabase
-      .from(tableName)
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error(`❌ Error loading ${tableName}:`, error)
-      // Fallback to localStorage
-      const saved = localStorage.getItem(tableName)
-      return saved ? JSON.parse(saved) : []
-    }
-
-    if (data) {
-      // Update localStorage with latest data
-      localStorage.setItem(tableName, JSON.stringify(data))
-      console.log(`✅ Loaded ${tableName} from Supabase (${data.length} items)`)
-      return data
-    }
-
+    console.warn(`⚠️ Supabase not available — cannot load ${tableName}`)
     return []
-  } catch (error) {
-    console.error(`❌ Error loading ${tableName}:`, error)
-    // Fallback to localStorage
-    const saved = localStorage.getItem(tableName)
-    return saved ? JSON.parse(saved) : []
   }
+
+  const fetchWithTimeout = new Promise<Record<string, unknown>[] | null>((resolve) => {
+    const timer = setTimeout(() => {
+      console.warn(`⏱️ Supabase fetch timeout for ${tableName}, will retry in background`)
+      resolve(null)
+    }, 8000)
+
+    void (async () => {
+      try {
+        const { data, error } = await supabase!
+          .from(tableName)
+          .select('*')
+          .order('created_at', { ascending: false })
+        clearTimeout(timer)
+        if (error) {
+          console.error(`❌ Error loading ${tableName}:`, error)
+          resolve(null)
+        } else {
+          resolve((data as Record<string, unknown>[]) ?? [])
+        }
+      } catch (err) {
+        clearTimeout(timer)
+        console.error(`❌ Fetch error for ${tableName}:`, err)
+        resolve(null)
+      }
+    })()
+  })
+
+  const result = await fetchWithTimeout
+
+  if (result !== null) {
+    console.log(`✅ Loaded ${tableName} from Supabase (${result.length} items)`)
+    return result
+  }
+
+  scheduleBackgroundRetry(tableName)
+  return []
+}
+
+/**
+ * Retry Supabase fetch in the background after a short delay.
+ */
+const scheduleBackgroundRetry = (tableName: TableName) => {
+  setTimeout(async () => {
+    if (!isSupabaseAvailable || !supabase) return
+    try {
+      const { data, error } = await supabase
+        .from(tableName)
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (!error && data) {
+        console.log(`🔄 Background retry loaded ${tableName} (${data.length} items)`)
+        if (tableName === 'vehicles' || tableName === 'parts' || tableName === 'inquiries' || tableName === 'part_orders' || tableName === 'business_settings') {
+          dispatchDataChange(tableName, 'update')
+        }
+      }
+    } catch (err) {
+      console.warn(`⚠️ Background retry failed for ${tableName}:`, err)
+    }
+  }, 3000)
 }

@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import PartCard from './PartCard'
 import PartModal from './PartModal'
 import PartsPurchaseModal from './PartsPurchaseModal'
-import { Part } from '../lib/supabase'
+import { Part, partsService } from '../lib/supabase'
 import { subscribeToTable, loadInitialData } from '../lib/realtimeSubscriptions'
+import { onDataChange, onStorageChange } from '../lib/dataEvents'
 
 const defaultParts: Part[] = [
   {
@@ -94,6 +95,16 @@ const Parts = () => {
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
 
+  // Reload fresh data from the service layer
+  const reloadParts = useCallback(async () => {
+    try {
+      const data = await partsService.getAll()
+      setParts((data.length > 0 ? data : defaultParts) as Part[])
+    } catch (error) {
+      console.error('Error reloading parts:', error)
+    }
+  }, [])
+
   useEffect(() => {
     // Load initial data
     const initializeData = async () => {
@@ -104,18 +115,30 @@ const Parts = () => {
 
     initializeData()
 
-    // Subscribe to real-time changes
+    // Subscribe to Supabase real-time changes (works when Supabase is configured)
     const subscription = subscribeToTable('parts', (updatedParts) => {
       setParts((updatedParts.length > 0 ? updatedParts : defaultParts) as Part[])
     })
 
-    // Cleanup subscription on unmount
+    // Subscribe to custom data events (same-tab admin changes — always works)
+    const unsubscribeDataChange = onDataChange('parts', () => {
+      reloadParts()
+    })
+
+    // Subscribe to cross-tab localStorage changes (admin in different tab)
+    const unsubscribeStorage = onStorageChange('parts', () => {
+      reloadParts()
+    })
+
+    // Cleanup all subscriptions on unmount
     return () => {
       if (subscription) {
         subscription.unsubscribe()
       }
+      unsubscribeDataChange()
+      unsubscribeStorage()
     }
-  }, [])
+  }, [reloadParts])
 
   // Filter to show only available parts
   const availableParts = parts.filter(p => p.available)

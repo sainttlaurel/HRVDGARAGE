@@ -15,7 +15,7 @@ console.log('Supabase Key available:', !!supabaseKey)
 
 try {
   if (!supabaseUrl || !supabaseKey) {
-    console.warn('⚠️ Supabase environment variables not set. Using localStorage fallback.')
+    console.warn('⚠️ Supabase environment variables not set.')
     console.warn('VITE_SUPABASE_URL:', supabaseUrl ? 'SET' : 'NOT SET')
     console.warn('VITE_SUPABASE_PUBLISHABLE_KEY:', supabaseKey ? 'SET' : 'NOT SET')
     supabaseError = new Error('Missing Supabase environment variables')
@@ -31,6 +31,37 @@ try {
 }
 
 export { supabase, supabaseError, isSupabaseAvailable }
+
+/** Supabase-only reads — no localStorage fallback */
+async function fetchAllRows<T>(table: string): Promise<T[]> {
+  if (!isSupabaseAvailable || !supabase) return []
+  const { data, error } = await supabase
+    .from(table)
+    .select('*')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return (data as T[]) ?? []
+}
+
+async function fetchRowById<T>(table: string, id: string): Promise<T | undefined> {
+  if (!isSupabaseAvailable || !supabase) return undefined
+  const { data, error } = await supabase.from(table).select('*').eq('id', id).single()
+  if (error) {
+    if (error.code === 'PGRST116') return undefined
+    throw error
+  }
+  return data as T
+}
+
+async function fetchSingleRow<T>(table: string): Promise<T | null> {
+  if (!isSupabaseAvailable || !supabase) return null
+  const { data, error } = await supabase.from(table).select('*').single()
+  if (error) {
+    if (error.code === 'PGRST116') return null
+    throw error
+  }
+  return data as T
+}
 
 // Types for database tables
 export interface Inquiry {
@@ -128,49 +159,11 @@ export interface VehicleInquiry {
 // Inquiry functions
 export const inquiryService = {
   async getAll() {
-    if (!isSupabaseAvailable || !supabase) {
-      // Fallback to localStorage
-      const saved = localStorage.getItem('inquiries')
-      return saved ? JSON.parse(saved) : []
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('inquiries')
-        .select('*')
-        .order('created_at', { ascending: false })
-      
-      if (error) throw error
-      return data as Inquiry[]
-    } catch (error) {
-      console.warn('Error fetching from Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('inquiries')
-      return saved ? JSON.parse(saved) : []
-    }
+    return fetchAllRows<Inquiry>('inquiries')
   },
 
   async getById(id: string) {
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('inquiries')
-      const inquiries = saved ? JSON.parse(saved) : []
-      return inquiries.find((i: Inquiry) => i.id === id)
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('inquiries')
-        .select('*')
-        .eq('id', id)
-        .single()
-      
-      if (error) throw error
-      return data as Inquiry
-    } catch (error) {
-      console.warn('Error fetching from Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('inquiries')
-      const inquiries = saved ? JSON.parse(saved) : []
-      return inquiries.find((i: Inquiry) => i.id === id)
-    }
+    return fetchRowById<Inquiry>('inquiries', id)
   },
 
   async create(inquiry: Omit<Inquiry, 'id' | 'createdAt' | 'updatedAt'>) {
@@ -285,48 +278,11 @@ export const inquiryService = {
 // Vehicle functions
 export const vehicleService = {
   async getAll() {
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('vehicles')
-      return saved ? JSON.parse(saved) : []
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('vehicles')
-        .select('*')
-        .order('created_at', { ascending: false })
-      
-      if (error) throw error
-      return data as Vehicle[]
-    } catch (error) {
-      console.warn('Error fetching from Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('vehicles')
-      return saved ? JSON.parse(saved) : []
-    }
+    return fetchAllRows<Vehicle>('vehicles')
   },
 
   async getById(id: string) {
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('vehicles')
-      const vehicles = saved ? JSON.parse(saved) : []
-      return vehicles.find((v: Vehicle) => v.id === id)
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('vehicles')
-        .select('*')
-        .eq('id', id)
-        .single()
-      
-      if (error) throw error
-      return data as Vehicle
-    } catch (error) {
-      console.warn('Error fetching from Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('vehicles')
-      const vehicles = saved ? JSON.parse(saved) : []
-      return vehicles.find((v: Vehicle) => v.id === id)
-    }
+    return fetchRowById<Vehicle>('vehicles', id)
   },
 
   async create(vehicle: Omit<Vehicle, 'id' | 'createdAt' | 'updatedAt'>) {
@@ -438,24 +394,7 @@ export const vehicleService = {
 // Business Settings functions
 export const settingsService = {
   async get() {
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('business_settings')
-      return saved ? JSON.parse(saved) : null
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('business_settings')
-        .select('*')
-        .single()
-      
-      if (error && error.code !== 'PGRST116') throw error
-      return data as BusinessSettings | null
-    } catch (error) {
-      console.warn('Error fetching from Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('business_settings')
-      return saved ? JSON.parse(saved) : null
-    }
+    return fetchSingleRow<BusinessSettings>('business_settings')
   },
 
   async update(updates: Partial<BusinessSettings>) {
@@ -539,48 +478,11 @@ export const settingsService = {
 // Parts functions
 export const partsService = {
   async getAll() {
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('parts')
-      return saved ? JSON.parse(saved) : []
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('parts')
-        .select('*')
-        .order('created_at', { ascending: false })
-      
-      if (error) throw error
-      return data as Part[]
-    } catch (error) {
-      console.warn('Error fetching from Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('parts')
-      return saved ? JSON.parse(saved) : []
-    }
+    return fetchAllRows<Part>('parts')
   },
 
   async getById(id: string) {
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('parts')
-      const parts = saved ? JSON.parse(saved) : []
-      return parts.find((p: Part) => p.id === id)
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('parts')
-        .select('*')
-        .eq('id', id)
-        .single()
-      
-      if (error) throw error
-      return data as Part
-    } catch (error) {
-      console.warn('Error fetching from Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('parts')
-      const parts = saved ? JSON.parse(saved) : []
-      return parts.find((p: Part) => p.id === id)
-    }
+    return fetchRowById<Part>('parts', id)
   },
 
   async create(part: Omit<Part, 'id' | 'createdAt' | 'updatedAt'>) {
@@ -693,24 +595,7 @@ export const partsService = {
 // Part Orders functions
 export const partOrdersService = {
   async getAll() {
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('part_orders')
-      return saved ? JSON.parse(saved) : []
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('part_orders')
-        .select('*')
-        .order('created_at', { ascending: false })
-      
-      if (error) throw error
-      return data as PartOrder[]
-    } catch (error) {
-      console.warn('Error fetching from Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('part_orders')
-      return saved ? JSON.parse(saved) : []
-    }
+    return fetchAllRows<PartOrder>('part_orders')
   },
 
   async create(order: Omit<PartOrder, 'id' | 'createdAt' | 'updatedAt'>) {
@@ -823,24 +708,7 @@ export const partOrdersService = {
 // Vehicle Inquiries functions
 export const vehicleInquiryService = {
   async getAll() {
-    if (!isSupabaseAvailable || !supabase) {
-      const saved = localStorage.getItem('vehicle_inquiries')
-      return saved ? JSON.parse(saved) : []
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('vehicle_inquiries')
-        .select('*')
-        .order('created_at', { ascending: false })
-      
-      if (error) throw error
-      return data as VehicleInquiry[]
-    } catch (error) {
-      console.warn('Error fetching from Supabase, using localStorage:', error)
-      const saved = localStorage.getItem('vehicle_inquiries')
-      return saved ? JSON.parse(saved) : []
-    }
+    return fetchAllRows<VehicleInquiry>('vehicle_inquiries')
   },
 
   async create(inquiry: Omit<VehicleInquiry, 'id' | 'createdAt' | 'updatedAt'>) {

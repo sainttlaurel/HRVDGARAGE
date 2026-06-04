@@ -7,6 +7,7 @@ import {
   exportVehicles,
   getVehicleStats,
 } from '../../lib/adminUtils'
+import { dispatchDataChange } from '../../lib/dataEvents'
 
 const AdminInventory = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
@@ -74,6 +75,7 @@ const AdminInventory = () => {
         setEditingId(null)
         setEditForm({})
         setShowPhotoManager(false)
+        dispatchDataChange('vehicles', 'update')
       } catch (error) {
         console.error('Error saving vehicle:', error)
       }
@@ -86,6 +88,7 @@ const AdminInventory = () => {
         await vehicleService.delete(id)
         const updated = vehicles.filter(v => v.id !== id)
         setVehicles(updated)
+        dispatchDataChange('vehicles', 'delete')
       } catch (error) {
         console.error('Error deleting vehicle:', error)
       }
@@ -101,6 +104,7 @@ const AdminInventory = () => {
           v.id === id ? { ...v, available: !v.available } : v
         )
         setVehicles(updated)
+        dispatchDataChange('vehicles', 'update')
       }
     } catch (error) {
       console.error('Error toggling availability:', error)
@@ -141,6 +145,7 @@ const AdminInventory = () => {
       })
       setShowAddForm(false)
       setStats(getVehicleStats([created, ...vehicles]))
+      dispatchDataChange('vehicles', 'create')
     } catch (error) {
       console.error('Error adding vehicle:', error)
     }
