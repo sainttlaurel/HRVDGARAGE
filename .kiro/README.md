@@ -37,7 +37,8 @@ All 71 linting, TypeScript, and critical runtime issue warnings have been succes
 With code quality at 100%, the next phases focus on functional testing and optional feature additions.
 
 ### Phase 2: Functional Testing (Next Priority)
-* [ ] **Image Path Verification:** Audit network tab for 404 image errors (especially paths under `/cars/` and `/image/`).
+* [x] **Image Path Verification:** Verified all `/cars/` and `/image/` paths exist under public assets. No 404 errors.
+* [x] **Admin Portal Functionality:** Audited and verified CRUD operations. Implemented and verified the missing Add Vehicle form and logic in the Inventory tab.
 * [ ] **Mobile Testing:** Verify responsiveness and layout at 375px (iPhone SE), 360px (Galaxy), and 768px (Tablet). Check touch target sizes.
 * [ ] **Network Resilience:** Verify fallback layout and indicators when offline or on a Slow 3G connection.
 * [ ] **Supabase Edge Cases:** Test behavior under session token expiry and handle errors gracefully.
