@@ -1,4 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import LoadingScreen from './components/LoadingScreen'
 import Paywall from './components/Paywall'
 import Navbar from './components/Navbar'
@@ -112,6 +113,7 @@ function App() {
   return (
     <ErrorBoundary>
       <>
+        <Analytics />
         {/* Paywall Overlay - Shows after loading screen */}
         <Paywall isActive={showPaywall} />
 
