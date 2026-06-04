@@ -23,8 +23,8 @@ const GalleryWall = lazy(() => import('./components/GalleryWall'))
 const Showreel = lazy(() => import('./components/Showreel'))
 const AdminPortal = lazy(() => import('./pages/AdminPortal'))
 
-// Paywall active flag - set to true to enable paywall
-const PAYWALL_ACTIVE = false
+// Paywall: show after 30 seconds of browsing
+const PAYWALL_DELAY_MS = 30_000
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -33,16 +33,20 @@ function App() {
 
   useEffect(() => {
     // Lock scroll when paywall is active
-    if (PAYWALL_ACTIVE && showPaywall) {
+    if (showPaywall) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'unset'
     }
-
-    return () => {
-      document.body.style.overflow = 'unset'
-    }
+    return () => { document.body.style.overflow = 'unset' }
   }, [showPaywall])
+
+  // 30-second timer — starts after loading screen completes
+  useEffect(() => {
+    if (isLoading || isAdminPage) return
+    const timer = setTimeout(() => setShowPaywall(true), PAYWALL_DELAY_MS)
+    return () => clearTimeout(timer)
+  }, [isLoading, isAdminPage])
 
   useEffect(() => {
     // Initialize offline support
@@ -74,10 +78,7 @@ function App() {
 
   const handleLoadingComplete = () => {
     setIsLoading(false)
-    // Show paywall after loading screen completes
-    if (PAYWALL_ACTIVE) {
-      setShowPaywall(true)
-    }
+    // 30s timer starts automatically via useEffect above
   }
 
   const navigateHome = () => {
