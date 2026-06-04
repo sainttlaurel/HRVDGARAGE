@@ -26,7 +26,7 @@ const Showreel = lazy(() => import('./components/Showreel'))
 const AdminPortal = lazy(() => import('./pages/AdminPortal'))
 
 // Paywall active flag - set to true to enable paywall
-const PAYWALL_ACTIVE = true
+const PAYWALL_ACTIVE = false
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
