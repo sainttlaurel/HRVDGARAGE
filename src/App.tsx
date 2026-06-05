@@ -23,9 +23,9 @@ const GalleryWall = lazy(() => import('./components/GalleryWall'))
 const Showreel = lazy(() => import('./components/Showreel'))
 const AdminPortal = lazy(() => import('./pages/AdminPortal'))
 
-// Paywall: show after 30 seconds of browsing — set to false to disable
-const PAYWALL_ENABLED = false
-const PAYWALL_DELAY_MS = 30_000
+// Paywall: show after 20 seconds of browsing — set to false to disable
+const PAYWALL_ENABLED = true
+const PAYWALL_DELAY_MS = 20_000
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -42,7 +42,7 @@ function App() {
     return () => { document.body.style.overflow = 'unset' }
   }, [showPaywall])
 
-  // 30-second timer — starts after loading screen completes
+  // 20-second timer — starts after loading screen completes
   useEffect(() => {
     if (isLoading || isAdminPage || !PAYWALL_ENABLED) return
     const timer = setTimeout(() => setShowPaywall(true), PAYWALL_DELAY_MS)

@@ -76,5 +76,5 @@ Admin adds vehicle/part → Supabase DB → public site reads on load
 - [ ] Upload real car/part photos to Supabase Storage and use those URLs in admin
 - [ ] Load contact info (phone, email, location) from `business_settings` on public site
 - [ ] Wire up vehicle inquiry form in `VehicleModal`
-- [ ] Paywall: show after 30 seconds of browsing
+- [x] Paywall: enabled, shows after 20 seconds of browsing
 - [ ] Add real `VITE_GA_TRACKING_ID` in Vercel
